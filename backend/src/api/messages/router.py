@@ -1,47 +1,32 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query
-from pydantic import (
-    NonNegativeInt,
-    PositiveInt,
-)
+from fastapi import APIRouter, Depends, Query
+from pydantic import NonNegativeInt, PositiveInt
 
-from obsirag_backend.api.messages.contracts import (
-    MessageResponse,
-    ModelMessageResponse,
-    UserMessageRequest,
-)
+from src.api.messages.dependencies import get_message_repository
+from src.api.messages.schemas import AnswerResponse, MessageHistoryResponse, MessageSchema, QueryRequest
+from src.repositories.message.interface import MessageRepository
 
-router = APIRouter(prefix="/api/messages")
+messages_router = APIRouter(prefix="/messages")
 
 
-@router.get("/")
+@messages_router.get("/", response_model=MessageHistoryResponse)
 async def get_chat_messages(
-    offset: Annotated[
-        NonNegativeInt,
-        Query(),
-    ] = 0,
-    limit: Annotated[
-        PositiveInt,
-        Query(le=100),
-    ] = 10,
-) -> list[MessageResponse]:
-    del offset
-    return [
-        MessageResponse(
-            role="user",
-            content="",
-            datetime="2024-11-13 23:34:00.000000",
-        )
-        for _ in range(limit)
-    ]
+    message_repo: Annotated[MessageRepository, Depends(get_message_repository)],
+    offset: Annotated[NonNegativeInt, Query()] = 0,
+    limit: Annotated[PositiveInt, Query(le=100)] = 10,
+) -> MessageHistoryResponse:
+    message_dicts = await message_repo.get_many(limit, offset)
+    return MessageHistoryResponse(messages=[MessageSchema(**message_dict) for message_dict in message_dicts])
 
 
-@router.post("/")
+@messages_router.post("/", response_model=AnswerResponse)
 async def post_user_message(
-    user_message: UserMessageRequest,
-) -> ModelMessageResponse:
-    return ModelMessageResponse(
+    user_message: QueryRequest,
+    message_repo: Annotated[MessageRepository, Depends(get_message_repository)],
+) -> AnswerResponse:
+    await message_repo.create(content=user_message.content, role="user")
+    return AnswerResponse(
         answer=user_message.content,
         related_documents=[
             "1.md",

@@ -1,16 +1,23 @@
-from pydantic import BaseModel
+from datetime import datetime
+
+from pydantic import BaseModel, Field
 
 
-class MessageResponse(BaseModel):
-    role: str
-    content: str
-    datetime: str
+class MessageSchema(BaseModel):
+    id: int = Field(examples=[1])
+    role: str = Field(examples=["user"])
+    content: str = Field(examples=["Какой язык стоит учить после Python?"])
+    created_date: datetime
 
 
-class UserMessageRequest(BaseModel):
-    content: str
+class MessageHistoryResponse(BaseModel):
+    messages: list[MessageSchema]
 
 
-class ModelMessageResponse(BaseModel):
-    answer: str
-    related_documents: list[str]
+class QueryRequest(BaseModel):
+    content: str = Field(examples=["Какой язык стоит учить после Python?"])
+
+
+class AnswerResponse(BaseModel):
+    answer: str = Field(examples=["Конечно же C++"])
+    related_documents: list[str] = Field(examples=[["C++.md", "Python vs C++.md"]])
