@@ -156,3 +156,12 @@ cython_debug/
 
 # PyCharm
 .idea/
+
+# Backend venv
+backend/venv
+
+# Fronten node modules
+frontend/node_modules
+
+# Obsidian folder
+obsidian
