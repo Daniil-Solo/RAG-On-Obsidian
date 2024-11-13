@@ -1,0 +1,38 @@
+.reactMarkDown * {
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.message {
+    padding: 12px;
+    border-radius: 16px;
+    max-width: 90%;
+}
+
+.assistant-message{
+    border-bottom-left-radius: 0;
+    align-self: flex-start;
+    background-color: var(--light-violet);
+    -webkit-box-shadow: -5px 5px 5px -5px rgba(34, 60, 80, 0.6);
+    -moz-box-shadow: -5px 5px 5px -5px rgba(34, 60, 80, 0.6);
+    box-shadow: -5px 5px 5px -5px rgba(34, 60, 80, 0.6);
+}
+
+.user-message{
+    border-bottom-right-radius: 0;
+    align-self: flex-end;
+    color: white;
+    background-color: var(--dark-violet);
+    -webkit-box-shadow: 5px 5px 5px -5px rgba(34, 60, 80, 0.6);
+    -moz-box-shadow: 5px 5px 5px -5px rgba(34, 60, 80, 0.6);
+    box-shadow: 5px 5px 5px -5px rgba(34, 60, 80, 0.6);
+}
+
+.user-message table, 
+.user-message th,
+.user-message  td {
+    border-color: white !important;
+}
+.user-message a {
+    color: var(--light-violet);
+}

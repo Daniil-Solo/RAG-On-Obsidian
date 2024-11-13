@@ -1,0 +1,16 @@
+.navbar__link {
+    text-decoration: none;
+    padding: 8px 16px;
+    color: var(--grey);
+    font-weight: bold;
+    font-size: 20px;
+}
+.navbar__link:hover{
+    background-color: var(--light-violet);
+    color: var(--dark);
+    transition: background-color 0.7s;
+    cursor: pointer;
+}
+.navbar__link.active{
+    color: var(--violet);
+}
