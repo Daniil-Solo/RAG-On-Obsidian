@@ -16,7 +16,7 @@ def create_application() -> FastAPI:
     """
     application = FastAPI(
         title="RAG on Obsidian",
-        version="0.0.1",
+        version="0.1.0",
         docs_url=None,
         redoc_url=None,
     )
