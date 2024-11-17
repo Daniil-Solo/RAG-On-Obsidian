@@ -1,31 +1,32 @@
-[project]
-name = 'obsirag_backend'
-version = "0.0.1"
-classifiers = [
-  'Development Status :: 5 - Production/Stable',
-  'Programming Language :: Python',
-  'Programming Language :: Python :: 3.11',
-  'Programming Language :: Python :: 3 :: Only',
-]
-requires-python = '>=3.11'
-dependencies = [
-  'fastapi~=0.115.5',
-]
+[tool.poetry]
+name = "rag-on-obsidian-backend"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.5"
+uvicorn = "^0.32.0"
+pydantic-settings = "^2.6.1"
+sqlalchemy = "^2.0.36"
+asyncpg = "^0.30.0"
+aiosqlite = "^0.20.0"
+sqlmodel = "^0.0.22"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.7.3"
 
 [project.optional-dependencies]
 dev = [
-  'pre-commit',
   'ruff',
   'pytest',
-  'commitizen',
-  'setuptools>=64',
 ]
 
 [build-system]
-requires = [
-  'setuptools>=64',
-]
-build-backend = 'setuptools.build_meta'
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.commitizen]
 name = 'cz_conventional_commits'
@@ -36,4 +37,8 @@ update_changelog_on_bump = true
 major_version_zero = true
 
 [tool.ruff]
+fix=true
+unsafe-fixes=false
 line-length = 120
+lint.select = ["ALL"]
+lint.ignore = ["F401", "FA102", "D211", "D213", "D", "DTZ005", "FA100", "COM812", "ISC001"]
