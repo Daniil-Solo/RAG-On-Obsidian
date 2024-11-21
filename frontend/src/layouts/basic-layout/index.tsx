@@ -1,4 +1,4 @@
-import {Container, Group, Space} from '@mantine/core';
+import {Container, Group} from '@mantine/core';
 import {NavLink} from "react-router-dom";
 import "./index.css";
 
@@ -24,7 +24,7 @@ export interface BasicLayoutProps  {
 
 const BasicLayout = (props: BasicLayoutProps) => {
     return (
-        <Container size="md">
+        <Container fluid={false} size="lg">
             <div style={{height: "100vh"}}>
                 <Group h={"10%"} component={"nav"} justify="center">
                     {
@@ -35,8 +35,7 @@ const BasicLayout = (props: BasicLayoutProps) => {
                         ))
                     }
                 </Group>
-                <Space h={"5%"}/>
-                <main style={{height: "85%"}}>
+                <main style={{height: "90%"}}>
                     {props.children}
                 </main>
             </div>

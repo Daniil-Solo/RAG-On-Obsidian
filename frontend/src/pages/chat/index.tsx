@@ -35,27 +35,32 @@ export const ChatPage = () => {
 
     return (
         <BasicLayout>
-            <Flex direction={"column"} p={8} h="100%" style={{backgroundColor: "var(--light)", borderRadius: 16}}>
-                <ScrollArea p={16} style={{flexGrow: 1}} viewportRef={viewport}>
-                    <MessageHistory messages={messages}/>
-                </ScrollArea>
-                <Textarea
-                    value={userCurrentMessage}
-                    onChange={e => setUserCurrentMessage(e.target.value)}
-                    mt={"auto"}
-                    radius="md"
-                    size="md"
-                    autosize={true}
-                    maxRows={5}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type your question"
-                    rightSectionWidth={42}
-                    rightSection={
-                        <ActionIcon size={28} radius="xl" color={"violet"} variant="filled" onClick={sendMessage}>
-                            <IconArrowRight style={{ width: 24, height: 24 }} stroke={1.5} />
-                        </ActionIcon>
-                    }
-                />
+            <Flex direction={"row"} h="100%" pb={8}>
+                <Flex direction={"column"} h="100%" w="70%">
+                    <ScrollArea p={16} style={{flexGrow: 1}} viewportRef={viewport}>
+                        <MessageHistory messages={messages}/>
+                    </ScrollArea>
+                    <Textarea
+                        value={userCurrentMessage}
+                        onChange={e => setUserCurrentMessage(e.target.value)}
+                        mt={"auto"}
+                        radius="md"
+                        size="md"
+                        autosize={true}
+                        maxRows={5}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Type your question"
+                        rightSectionWidth={42}
+                        rightSection={
+                            <ActionIcon size={28} radius="xl" color={"violet"} variant="filled" onClick={sendMessage}>
+                                <IconArrowRight style={{ width: 24, height: 24 }} stroke={1.5} />
+                            </ActionIcon>
+                        }
+                    />
+                </Flex>
+                <div style={{height: "100%", width: "30%"}}>
+                    {/*Related docs*/}
+                </div>
             </Flex>
         </BasicLayout>
     );
