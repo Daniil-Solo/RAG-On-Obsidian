@@ -12,6 +12,7 @@
 .assistant-message{
     border-bottom-left-radius: 0;
     align-self: flex-start;
+    color: var(--dark);
     background-color: var(--light-violet);
     -webkit-box-shadow: -5px 5px 5px -5px rgba(34, 60, 80, 0.6);
     -moz-box-shadow: -5px 5px 5px -5px rgba(34, 60, 80, 0.6);

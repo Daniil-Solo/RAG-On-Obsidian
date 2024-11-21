@@ -26,7 +26,7 @@ const BasicLayout = (props: BasicLayoutProps) => {
     return (
         <Container fluid={false} size="lg">
             <div style={{height: "100vh"}}>
-                <Group h={"10%"} component={"nav"} justify="center">
+                <Group h={"10%"} component={"nav"} justify="center" style={{position: "relative"}}>
                     {
                         LINKS.map(element => (
                             <NavLink key={element.title} className={"navbar__link"} to={element.url} end>

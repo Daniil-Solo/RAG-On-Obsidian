@@ -6,10 +6,11 @@
     font-size: 20px;
 }
 .navbar__link:hover{
-    background-color: var(--light-violet);
-    color: var(--dark);
+    background-color: var(--light);
+    color: var(--dark-violet);
     transition: background-color 0.7s;
     cursor: pointer;
+    border-radius: 24px;
 }
 .navbar__link.active{
     color: var(--violet);
