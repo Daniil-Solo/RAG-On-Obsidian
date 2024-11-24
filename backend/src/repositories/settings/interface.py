@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class SettingsRepository(ABC):
     @abstractmethod
-    async def get_llm_settings(self) -> dict:
+    async def get_llm_settings(self) -> dict | None:
         raise NotImplementedError
 
     @abstractmethod

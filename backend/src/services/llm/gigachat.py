@@ -15,9 +15,9 @@ class GigaChatLLMService(LLMService):
             credentials=token,
             verify_ssl_certs=False,
             max_tokens=max_length,
-        ).configurable_fields(
-            max_tokens=ConfigurableField(id="max_tokens"),
         )
+        # We have to call configurable_fields to be able to change the max_tokens parameter during model checking
+        self._model = self._model.configurable_fields(max_tokens=ConfigurableField(id="max_tokens"))
 
     def check(self) -> bool:
         try:
