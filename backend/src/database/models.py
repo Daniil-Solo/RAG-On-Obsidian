@@ -15,6 +15,16 @@ class MessageModel(SQLModel, table=True):
     created_date: datetime = Field(default_factory=datetime.utcnow)
 
 
+class LLMSettingsModel(SQLModel, table=True):
+    __tablename__ = "llm_settings"
+
+    id: int = Field(default=None, primary_key=True)
+    model_type: str = Field(..., nullable=False)
+    token: str = Field(..., nullable=False)
+    model_name: str = Field(..., nullable=False)
+    max_length: int = Field(..., nullable=False)
+
+
 # Before all models
 metadata = SQLModel.metadata
 engine = create_engine(url=app_config.sync_db_url, echo=True)
