@@ -1,10 +1,10 @@
 import {Stack} from '@mantine/core';
-import {IMessage} from "../../types/messages"
+import {MessageSchema} from "../../types/messages"
 import Message from "./../message"
 
 
 export interface MessageHistoryProps  {
-  messages: Array<IMessage>
+  messages: Array<MessageSchema>
 }
 
 const MessageHistory = (props: MessageHistoryProps) => {
@@ -13,7 +13,7 @@ const MessageHistory = (props: MessageHistoryProps) => {
     <Stack h="100%" >
         {
           props.messages.map(message => (
-            <Message message={message}/>
+            <Message key={message.id} message={message}/>
           ))
         }
     </Stack>

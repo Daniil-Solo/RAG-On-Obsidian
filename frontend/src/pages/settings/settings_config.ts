@@ -12,12 +12,12 @@ const VENDORS: Array<VendorInfo> = [
         ]
     },
     {
-        name: "Mistral",
+        name: "Mistral AI",
         models: [
             "mistral-large-latest", "ministral-3b-latest", "ministral-8b-latest", 
             "mistral-small-latest", "codestral-latest"
         ]
-    },
+    }
 ]
 
 

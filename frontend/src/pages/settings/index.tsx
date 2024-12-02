@@ -1,8 +1,9 @@
 import BasicLayout from "../../layouts/basic-layout"
 import {Tabs, Flex, Stack, TextInput, NumberInput, Select, Group, Button, useComputedColorScheme, useMantineColorScheme, MantineColorScheme } from '@mantine/core';
-import { useState } from "react";
-import { VENDORS } from "./llm_settings";
+import { useState, useEffect } from "react";
+import { VENDORS } from "./settings_config";
 import { LLMSettings } from "../../types/settings";
+import { useLLMSettings } from "../../hooks/settings";
 
 
 const initialLLMSettings: LLMSettings = {
@@ -16,6 +17,14 @@ export const SettingsPage = () => {
     const [llmSettings, setLLMSettings] = useState<LLMSettings>(initialLLMSettings);
     const { setColorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
+    const {data, isSuccess} = useLLMSettings()
+    useEffect(() => {
+        if (data){
+            setLLMSettings({vendor: data.model_type, model: data.model_name, token: data.token, maxTokens: data.max_length})
+        }
+    }, [isSuccess, data]);
+
 
     return (
         <BasicLayout>
@@ -33,7 +42,7 @@ export const SettingsPage = () => {
                                 variant="filled"
                                 size="sm"
                                 w={300}
-                                label="Vendor"
+                                label="Type"
                                 placeholder="Not selected"
                                 data={VENDORS.map(vendor => vendor.name)}
                                 value={llmSettings.vendor} 
@@ -44,7 +53,7 @@ export const SettingsPage = () => {
                                 size="sm"
                                 w={300}
                                 label="Model"
-                                placeholder="Not selected"
+                                placeholder={llmSettings.vendor? "Not selected": "Сhoose a vendor first"}
                                 data={llmSettings.vendor? VENDORS.filter(vendor => vendor.name == llmSettings.vendor)[0].models: []}
                                 value={llmSettings.model} 
                                 onChange={value => setLLMSettings({...llmSettings, model: value})}
@@ -54,7 +63,7 @@ export const SettingsPage = () => {
                                 size="sm"
                                 w={300}
                                 label="API Token"
-                                placeholder="Not selected"
+                                placeholder="Input here"
                                 value={llmSettings.token}
                                 onChange={e => setLLMSettings({...llmSettings, token: e.target.value})}
                             />
