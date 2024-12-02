@@ -33,8 +33,8 @@ export const SettingsPage = () => {
                                 variant="filled"
                                 size="sm"
                                 w={300}
-                                label="Вендор"
-                                placeholder="Не выбран"
+                                label="Vendor"
+                                placeholder="Not selected"
                                 data={VENDORS.map(vendor => vendor.name)}
                                 value={llmSettings.vendor} 
                                 onChange={value => setLLMSettings({...llmSettings, vendor: value, model: null})}
@@ -43,8 +43,8 @@ export const SettingsPage = () => {
                                 variant="filled"
                                 size="sm"
                                 w={300}
-                                label="Модель"
-                                placeholder="Не выбрана"
+                                label="Model"
+                                placeholder="Not selected"
                                 data={llmSettings.vendor? VENDORS.filter(vendor => vendor.name == llmSettings.vendor)[0].models: []}
                                 value={llmSettings.model} 
                                 onChange={value => setLLMSettings({...llmSettings, model: value})}
@@ -53,8 +53,8 @@ export const SettingsPage = () => {
                                 variant="filled"
                                 size="sm"
                                 w={300}
-                                label="Токен"
-                                placeholder="Не указан"
+                                label="API Token"
+                                placeholder="Not selected"
                                 value={llmSettings.token}
                                 onChange={e => setLLMSettings({...llmSettings, token: e.target.value})}
                             />
@@ -62,8 +62,8 @@ export const SettingsPage = () => {
                                 variant="filled"
                                 size="sm"
                                 w={300}
-                                label="Макс. размер ответа в токенах"
-                                placeholder="Не указан"
+                                label="Maximum of tokens for answer"
+                                placeholder="Not selected"
                                 thousandSeparator=" "
                                 min={1}
                                 max={130000}
@@ -72,10 +72,10 @@ export const SettingsPage = () => {
                             />
                             <Group>
                                 <Button size="sm" variant="outline">
-                                    Проверить
+                                    Check
                                 </Button>
                                 <Button size="sm" variant="filled">
-                                    Сохранить
+                                    Save
                                 </Button>
                             </Group>
                         </Stack>
@@ -89,8 +89,8 @@ export const SettingsPage = () => {
                                 variant="filled"
                                 size="sm"
                                 w={300}
-                                label="Тема"
-                                data={[{label: "Темная", value: "dark"}, {label: "Светлая", value: "light"}]}
+                                label="Theme"
+                                data={[{label: "Dark", value: "dark"}, {label: "Light", value: "light"}]}
                                 value={computedColorScheme} 
                                 onChange={value => value && setColorScheme(value as MantineColorScheme)}
                             />

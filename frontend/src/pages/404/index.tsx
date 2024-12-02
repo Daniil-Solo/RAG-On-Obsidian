@@ -6,7 +6,7 @@ export const Page404 = () => {
         <BasicLayout>
             <Stack>
                 <Title order={2} ta="center">404</Title>
-                <Title order={3} ta="center">Страница не существует</Title>
+                <Title order={3} ta="center">This page doesnt exist</Title>
             </Stack>
         </BasicLayout>
     );
