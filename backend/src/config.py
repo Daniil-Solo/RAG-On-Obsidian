@@ -14,6 +14,7 @@ class ApplicationConfig(BaseSettings):
     OBSIDIAN_PATH: str = DirectoryPath()
     MODE: ApplicationMode = Field(default=ApplicationMode.DEBUG)
     DB_PATH: str = Field(default="./rag_on_obsidian.db")
+    ORIGINS: str = Field(default="")
 
     @property
     def is_debug(self) -> bool:
@@ -26,6 +27,10 @@ class ApplicationConfig(BaseSettings):
     @property
     def async_db_url(self) -> str:
         return f"sqlite+aiosqlite:///{self.DB_PATH}"
+
+    @property
+    def origins(self) -> list[str]:
+        return self.ORIGINS.split(",")
 
     model_config = SettingsConfigDict(env_file=".env")
 
