@@ -1,5 +1,5 @@
 import {Stack} from '@mantine/core';
-import {IMessage} from "./../../types/message"
+import {IMessage} from "../../types/messages"
 import Message from "./../message"
 
 

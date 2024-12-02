@@ -1,4 +1,4 @@
-import {IMessage} from "./../../types/message"
+import {IMessage} from "../../types/messages"
 import Markdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'

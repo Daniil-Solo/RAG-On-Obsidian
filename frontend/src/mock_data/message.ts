@@ -1,4 +1,4 @@
-import {IMessage} from "./../types/message"
+import {IMessage} from "../types/messages"
 
 const MESSAGES: Array<IMessage> = [
     {
