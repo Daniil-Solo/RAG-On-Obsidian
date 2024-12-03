@@ -2,15 +2,14 @@ from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
 
 from src.api.general_schemas import MessageResponse
 from src.api.settings.dependencies import get_settings_repository
 from src.api.settings.schemas import LLMAvailabilityResponse, LLMSettingsRequest, LLMSettingsResponse
 from src.repositories.settings.interface import SettingsRepository
-from src.services.llm import LLMServiceBuilder
+from src.services.llm_checker.builder import LLMCheckerBuilder
 
-settings_router = APIRouter(prefix="/settings")
+settings_router = APIRouter(prefix="/settings", tags=["messages"])
 
 
 @settings_router.get(
@@ -66,11 +65,13 @@ async def check_llm_availability(
     llm_settings: LLMSettingsRequest,
 ) -> LLMAvailabilityResponse:
     try:
-        llm_service = LLMServiceBuilder.create(**llm_settings.model_dump())
+        llm_checker = LLMCheckerBuilder.build(
+            llm_settings.vendor, llm_settings.model, llm_settings.token, llm_settings.base_url
+        )
     except NotImplementedError as err:
-        raise HTTPException from err(
+        raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail=f"Requested LLM type {llm_settings.model_type} was not found",
-        )
-    is_available = llm_service.check()
-    return LLMAvailabilityResponse(is_available=is_available)
+        ) from err
+    is_available, error_message = await llm_checker.check()
+    return LLMAvailabilityResponse(is_available=is_available, error_message=error_message)

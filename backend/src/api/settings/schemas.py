@@ -19,3 +19,4 @@ class LLMSettingsResponse(BaseLLMSettings):
 
 class LLMAvailabilityResponse(BaseModel):
     is_available: bool
+    error_message: str
