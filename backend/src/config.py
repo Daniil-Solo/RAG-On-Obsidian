@@ -30,7 +30,7 @@ class ApplicationConfig(BaseSettings):
 
     @property
     def origins(self) -> list[str]:
-        return self.ORIGINS.split(",")
+        return [origin for origin in self.ORIGINS.split(",") if origin != ""]
 
     model_config = SettingsConfigDict(env_file=".env")
 
