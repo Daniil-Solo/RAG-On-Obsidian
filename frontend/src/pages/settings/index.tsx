@@ -3,7 +3,7 @@ import {Tabs, Flex, Stack, TextInput, NumberInput, Select, Group, Button, useCom
 import { useState, useEffect } from "react";
 import { VENDORS } from "./settings_config";
 import { LLMSettings } from "../../types/settings";
-import { useLLMSettings } from "../../hooks/settings";
+import { useCheckLLM, useLLMSettings, useUpdateLLMSettings } from "../../hooks/settings";
 
 
 const initialLLMSettings: LLMSettings = {
@@ -17,8 +17,9 @@ export const SettingsPage = () => {
     const [llmSettings, setLLMSettings] = useState<LLMSettings>(initialLLMSettings);
     const { setColorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
-
-    const {data, isSuccess} = useLLMSettings()
+    const {mutateAsync: updateLLMSettings} = useUpdateLLMSettings();
+    const {mutateAsync: checkLLM} = useCheckLLM()
+    const {data, isSuccess} = useLLMSettings();
     useEffect(() => {
         if (data){
             setLLMSettings({vendor: data.model_type, model: data.model_name, token: data.token, maxTokens: data.max_length})
@@ -80,10 +81,20 @@ export const SettingsPage = () => {
                                 onChange={value => setLLMSettings({...llmSettings, maxTokens: +value})}
                             />
                             <Group>
-                                <Button size="sm" variant="outline">
+                                <Button size="sm" variant="outline" onClick={() => checkLLM({
+                                    model_type: llmSettings.vendor || "",
+                                    token: llmSettings.token,
+                                    model_name: llmSettings.model || "",
+                                    max_length: llmSettings.maxTokens
+                                })}>
                                     Check
                                 </Button>
-                                <Button size="sm" variant="filled">
+                                <Button size="sm" variant="filled" onClick={() => updateLLMSettings({
+                                    model_type: llmSettings.vendor || "",
+                                    token: llmSettings.token,
+                                    model_name: llmSettings.model || "",
+                                    max_length: llmSettings.maxTokens
+                                })}>
                                     Save
                                 </Button>
                             </Group>

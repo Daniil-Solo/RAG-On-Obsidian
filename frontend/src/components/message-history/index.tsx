@@ -4,7 +4,15 @@ import Message from "./../message"
 
 
 export interface MessageHistoryProps  {
-  messages: Array<MessageSchema>
+  messages: Array<MessageSchema>,
+  isAssistantThinking: boolean
+}
+
+const assistantThinkingMessage: MessageSchema = {
+  id: 'thinking',
+  role: 'assistant',
+  content: 'In thinking...',
+  datetime: ''
 }
 
 const MessageHistory = (props: MessageHistoryProps) => {
@@ -15,6 +23,9 @@ const MessageHistory = (props: MessageHistoryProps) => {
           props.messages.map(message => (
             <Message key={message.id} message={message}/>
           ))
+        }
+        {
+          props.isAssistantThinking && <Message message={assistantThinkingMessage}/>
         }
     </Stack>
     );

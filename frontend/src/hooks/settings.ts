@@ -4,6 +4,7 @@ import { LLMSettingsRequest, LLMAvailabilityResponse } from "../types/settings";
 import handleAPIError from "../utils/error-notifications";
 import notifySuccess from "../utils/success-notifications";
 import notifyWarning from "../utils/warning-notifications";
+import { MessageResponse } from "../types/general";
 
 
 const useLLMSettings = () => {
@@ -20,11 +21,12 @@ const useUpdateLLMSettings = () => {
     const queryClient = useQueryClient();
     return useMutation(
         {
-            mutationKey: ["settings_llm_check"],
+            mutationKey: ["update_settings_llm"],
             mutationFn: (data: LLMSettingsRequest) => updateLLMSettings(data),
             onError: handleAPIError,
-            onSuccess: () => {
+            onSuccess: (data: MessageResponse) => {
                 queryClient.invalidateQueries({ queryKey: ["settings_llm"] });
+                notifySuccess(data.message);
             },
         }
     )

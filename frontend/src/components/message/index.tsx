@@ -1,4 +1,4 @@
-import {IMessage} from "../../types/messages"
+import {MessageSchema} from "../../types/messages"
 import Markdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
@@ -37,7 +37,7 @@ const MARKDOWN_STYLES = {
 
 
 export interface MessageProps  {
-    message: IMessage
+    message: MessageSchema
 }
 
 
