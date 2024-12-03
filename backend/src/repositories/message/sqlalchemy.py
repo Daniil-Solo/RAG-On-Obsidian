@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, delete
 
 from src.database.models import MessageModel
 from src.repositories.message.interface import MessageRepository
@@ -20,3 +20,8 @@ class MessageSQLAlchemyRepository(MessageRepository):
         statement = select(MessageModel).order_by(MessageModel.created_date).offset(offset).limit(limit)
         result = await self.session.execute(statement)
         return [res.model_dump() for res in result.scalars().all()]
+
+    async def clean_all(self) -> None:
+        statement = delete(MessageModel)
+        await self.session.execute(statement)
+        await self.session.commit()
