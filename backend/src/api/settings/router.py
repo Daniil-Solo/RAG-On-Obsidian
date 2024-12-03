@@ -9,7 +9,7 @@ from src.api.settings.schemas import LLMAvailabilityResponse, LLMSettingsRequest
 from src.repositories.settings.interface import SettingsRepository
 from src.services.llm_checker.builder import LLMCheckerBuilder
 
-settings_router = APIRouter(prefix="/settings", tags=["messages"])
+settings_router = APIRouter(prefix="/settings", tags=["settings"])
 
 
 @settings_router.get(

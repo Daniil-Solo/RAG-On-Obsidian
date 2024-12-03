@@ -1,9 +1,10 @@
+from typing import Literal
 from abc import ABC, abstractmethod
 
 
 class MessageRepository(ABC):
     @abstractmethod
-    async def create(self, content: str, role: str) -> dict:
+    async def create(self, content: str, role: Literal["user", "assistant"]) -> dict:
         raise NotImplementedError
 
     @abstractmethod

@@ -3,10 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from pydantic import NonNegativeInt, PositiveInt
 
-from src.api.messages.dependencies import get_message_repository
+from src.api.messages.dependencies import get_message_repository, get_rag_service
 from src.api.messages.schemas import AnswerResponse, MessageHistoryResponse, MessageSchema, QueryRequest
 from src.api.general_schemas import MessageResponse
 from src.repositories.message.interface import MessageRepository
+from src.services.rag.base import BaseRag
 
 messages_router = APIRouter(prefix="/messages", tags=["messages"])
 
@@ -25,14 +26,14 @@ async def get_chat_messages(
 async def post_user_message(
     user_message: QueryRequest,
     message_repo: Annotated[MessageRepository, Depends(get_message_repository)],
+    rag_service: Annotated[BaseRag, Depends(get_rag_service)],
 ) -> AnswerResponse:
     await message_repo.create(content=user_message.content, role="user")
+    result = await rag_service.run(user_message.content)
+    await message_repo.create(content=result.answer, role="assistant")
     return AnswerResponse(
-        answer=user_message.content,
-        related_documents=[
-            "1.md",
-            "2.md",
-        ],
+        answer=result.answer,
+        related_documents=result.related_documents,
     )
 
 
