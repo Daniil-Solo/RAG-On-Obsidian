@@ -5,9 +5,10 @@ from pydantic import NonNegativeInt, PositiveInt
 
 from src.api.messages.dependencies import get_message_repository
 from src.api.messages.schemas import AnswerResponse, MessageHistoryResponse, MessageSchema, QueryRequest
+from src.api.general_schemas import MessageResponse
 from src.repositories.message.interface import MessageRepository
 
-messages_router = APIRouter(prefix="/messages")
+messages_router = APIRouter(prefix="/messages", tags=["messages"])
 
 
 @messages_router.get("/", response_model=MessageHistoryResponse)
@@ -32,4 +33,14 @@ async def post_user_message(
             "1.md",
             "2.md",
         ],
+    )
+
+
+@messages_router.delete("/", response_model=MessageResponse)
+async def clean_message_history(
+    message_repo: Annotated[MessageRepository, Depends(get_message_repository)],
+) -> MessageResponse:
+    await message_repo.clean_all()
+    return MessageResponse(
+        message="All messages have been successfully deleted"
     )
