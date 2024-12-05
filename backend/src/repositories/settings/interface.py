@@ -9,9 +9,10 @@ class SettingsRepository(ABC):
     @abstractmethod
     async def update_llm_settings(
         self,
-        model_type: str,
+        vendor: str,
         token: str,
-        model_name: str,
-        max_length: int,
+        model: str,
+        base_url: str,
+        max_tokens: int,
     ) -> None:
         raise NotImplementedError

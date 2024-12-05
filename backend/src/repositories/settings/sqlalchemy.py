@@ -18,28 +18,31 @@ class SettingsSQLAlchemyRepository(SettingsRepository):
 
     async def update_llm_settings(
         self,
-        model_type: str,
+        vendor: str,
         token: str,
-        model_name: str,
-        max_length: int,
+        model: str,
+        base_url: str,
+        max_tokens: int,
     ) -> None:
         existing_settings = await self.get_llm_settings()
         if existing_settings is None:
             new_settings = LLMSettingsModel(
-                model_type=model_type,
+                model_type=vendor,
                 token=token,
-                model_name=model_name,
-                max_length=max_length,
+                model_name=model,
+                base_url=base_url,
+                max_tokens=max_tokens,
             )
             self.session.add(new_settings)
         else:
             statement = (
                 update(LLMSettingsModel)
                 .values(
-                    model_type=model_type,
+                    model_type=vendor,
                     token=token,
-                    model_name=model_name,
-                    max_length=max_length,
+                    model_name=model,
+                    base_url=base_url,
+                    max_tokens=max_tokens,
                 )
             )
             await self.session.execute(statement)

@@ -42,10 +42,11 @@ async def post_user_message(
     settings_repo: Annotated[SettingsRepository, Depends(get_settings_repository)],
 ) -> MessageResponse:
     await settings_repo.update_llm_settings(
-        model_type=llm_settings.model_type,
+        vendor=llm_settings.vendor,
         token=llm_settings.token,
-        model_name=llm_settings.model_name,
-        max_length=llm_settings.max_length,
+        model=llm_settings.model,
+        base_url=llm_settings.base_url,
+        max_tokens=llm_settings.max_tokens,
     )
     return MessageResponse(message="LLM Settings updated successfully")
 
@@ -71,7 +72,7 @@ async def check_llm_availability(
     except NotImplementedError as err:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=f"Requested LLM type {llm_settings.model_type} was not found",
+            detail=f"Requested LLM type {llm_settings.vendor} was not found",
         ) from err
     is_available, error_message = await llm_checker.check()
     return LLMAvailabilityResponse(is_available=is_available, error_message=error_message)
