@@ -5,7 +5,7 @@ import "./index.css";
 const LINKS = [
     {
         title: "Chat",
-        url: "/chat"
+        url: "/"
     },
     {
         title: "Index",

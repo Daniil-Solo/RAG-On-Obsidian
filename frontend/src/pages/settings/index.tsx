@@ -10,6 +10,7 @@ const initialLLMSettings: LLMSettings = {
     vendor: null,
     model: null,
     token: "",
+    baseUrl: "",
     maxTokens: 512
 }
 
@@ -22,7 +23,7 @@ export const SettingsPage = () => {
     const {data, isSuccess} = useLLMSettings();
     useEffect(() => {
         if (data){
-            setLLMSettings({vendor: data.model_type, model: data.model_name, token: data.token, maxTokens: data.max_length})
+            setLLMSettings({vendor: data.vendor, model: data.model, token: data.token, maxTokens: data.max_tokens, baseUrl: data.base_url})
         }
     }, [isSuccess, data]);
 
@@ -82,18 +83,20 @@ export const SettingsPage = () => {
                             />
                             <Group>
                                 <Button size="sm" variant="outline" onClick={() => checkLLM({
-                                    model_type: llmSettings.vendor || "",
+                                    vendor: llmSettings.vendor || "",
                                     token: llmSettings.token,
-                                    model_name: llmSettings.model || "",
-                                    max_length: llmSettings.maxTokens
+                                    model: llmSettings.model || "",
+                                    max_tokens: llmSettings.maxTokens,
+                                    base_url: llmSettings.baseUrl
                                 })}>
                                     Check
                                 </Button>
                                 <Button size="sm" variant="filled" onClick={() => updateLLMSettings({
-                                    model_type: llmSettings.vendor || "",
+                                    vendor: llmSettings.vendor || "",
                                     token: llmSettings.token,
-                                    model_name: llmSettings.model || "",
-                                    max_length: llmSettings.maxTokens
+                                    model: llmSettings.model || "",
+                                    max_tokens: llmSettings.maxTokens,
+                                    base_url: llmSettings.baseUrl
                                 })}>
                                     Save
                                 </Button>

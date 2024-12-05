@@ -2,26 +2,24 @@ interface LLMSettings {
     vendor: string | null,
     model: string | null,
     token: string,
+    baseUrl: string,
     maxTokens: number
 }
 
 interface LLMSettingsRequest {
-    model_type: string;
+    vendor: string
+    model: string;
     token: string;
-    model_name: string;
-    max_length: number;
+    base_url: string;
+    max_tokens: number;
   }
   
 
-interface LLMSettingsResponse {
-    model_type: string;
-    token: string;
-    model_name: string;
-    max_length: number;
-}
+interface LLMSettingsResponse extends LLMSettingsRequest{};
 
 interface LLMAvailabilityResponse {
     is_available: boolean;
+    error_message: string;
 }
 
 export type {LLMSettings, LLMSettingsRequest, LLMSettingsResponse, LLMAvailabilityResponse};
