@@ -27,9 +27,9 @@ class SettingsSQLAlchemyRepository(SettingsRepository):
         existing_settings = await self.get_llm_settings()
         if existing_settings is None:
             new_settings = LLMSettingsModel(
-                model_type=vendor,
+                vendor=vendor,
                 token=token,
-                model_name=model,
+                model=model,
                 base_url=base_url,
                 max_tokens=max_tokens,
             )
@@ -38,9 +38,9 @@ class SettingsSQLAlchemyRepository(SettingsRepository):
             statement = (
                 update(LLMSettingsModel)
                 .values(
-                    model_type=vendor,
+                    vendor=vendor,
                     token=token,
-                    model_name=model,
+                    model=model,
                     base_url=base_url,
                     max_tokens=max_tokens,
                 )
