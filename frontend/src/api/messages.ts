@@ -1,4 +1,5 @@
 import axiosInstance from "./axios-config";
+import {MessageResponse} from "../types/general"
 import {QueryRequest, AnswerResponse, MessageHistoryResponse} from "../types/messages"
 
 
@@ -18,5 +19,11 @@ const sendChatMessage = async (data: QueryRequest) => {
     return response.data;
 };
 
+const cleanChatMessages = async () => {
+    const response = await axiosInstance.delete<MessageResponse>(API_MESSAGES);
+    return response.data;
+};
 
-export {getChatMessages, sendChatMessage};
+
+
+export {getChatMessages, sendChatMessage, cleanChatMessages};

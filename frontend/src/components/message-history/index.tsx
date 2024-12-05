@@ -21,11 +21,11 @@ const MessageHistory = (props: MessageHistoryProps) => {
     <Stack h="100%" >
         {
           props.messages.map(message => (
-            <Message key={message.id} message={message}/>
+            <Message key={message.id} isLoading={false} message={message}/>
           ))
         }
         {
-          props.isAssistantThinking && <Message message={assistantThinkingMessage}/>
+          props.isAssistantThinking && <Message isLoading={props.isAssistantThinking} message={assistantThinkingMessage}/>
         }
     </Stack>
     );

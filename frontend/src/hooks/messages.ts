@@ -1,4 +1,4 @@
-import { getChatMessages, sendChatMessage } from "../api/messages";
+import { getChatMessages, sendChatMessage, cleanChatMessages } from "../api/messages";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import { QueryRequest } from "../types/messages";
 import handleAPIError from "../utils/error-notifications";
@@ -28,4 +28,18 @@ const useSendChatMessage = () => {
     )
 };
 
-export {useChatMessages, useSendChatMessage};
+const useCleanChatMessage = () => {
+    const queryClient = useQueryClient();
+    return useMutation(
+        {
+            mutationKey: ["clean_chat_messages"],
+            mutationFn: () => cleanChatMessages(),
+            onError: handleAPIError,
+            onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ["chat_messages"] });
+            },
+        }
+    )
+};
+
+export {useChatMessages, useSendChatMessage, useCleanChatMessage};

@@ -3,6 +3,7 @@ import Markdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import {oneLight} from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { Loader } from '@mantine/core';
 import "./index.css";
 
 const MARKDOWN_STYLES = {
@@ -37,7 +38,8 @@ const MARKDOWN_STYLES = {
 
 
 export interface MessageProps  {
-    message: MessageSchema
+    message: MessageSchema,
+    isLoading: boolean
 }
 
 
@@ -46,12 +48,18 @@ const Message = (props: MessageProps) => {
     
     return (
         <div className={className}>
-            <Markdown 
-                remarkPlugins={[remarkGfm]} 
-                children={props.message.content} 
-                className="reactMarkDown"
-                components={MARKDOWN_STYLES}
-            />
+            {
+              props.isLoading
+              ? <Loader color="violet" type="dots" size="sm"/>
+              : (
+                <Markdown 
+                  remarkPlugins={[remarkGfm]} 
+                  children={props.message.content} 
+                  className="reactMarkDown"
+                  components={MARKDOWN_STYLES}
+              />
+              )
+            }
         </div>
     );
 }

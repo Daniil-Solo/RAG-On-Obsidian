@@ -1,9 +1,10 @@
 import BasicLayout from "../../layouts/basic-layout"
 import MessageHistory from "../../components/message-history"
-import {ScrollArea, Textarea , ActionIcon, Flex} from '@mantine/core';
+import  {ScrollArea, Textarea , ActionIcon, Flex, Button, List, ThemeIcon, Title, Divider, Text } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
-import {useEffect, useRef, useState} from "react";
-import { useChatMessages, useSendChatMessage } from "../../hooks/messages";
+import { useEffect, useRef, useState } from "react";
+import { useChatMessages, useSendChatMessage, useCleanChatMessage } from "../../hooks/messages";
+import {useLLMSettings} from "../../hooks/settings";
 import { MessageSchema } from "../../types/messages";
 
 
@@ -13,8 +14,11 @@ export const ChatPage = () => {
     const viewport = useRef<HTMLDivElement | null>(null);
     const [messages, setMessages] = useState<Array<MessageSchema>>([]);
     const [userCurrentMessage, setUserCurrentMessage] = useState("");
+    const [relatedDocuments, setRelatedDocuments] = useState<Array<string>>([]);
     const {data, isSuccess} = useChatMessages();
+    const {data: llmSettings, isSuccess: isLLMSettingsSuccess} = useLLMSettings();
     const {mutateAsync: sendMessage, isPending: isSendMessagePending} = useSendChatMessage();
+    const {mutateAsync: cleanMessages, isPending: isCleanMessagesPending} = useCleanChatMessage();
 
     useEffect(() => {
         if (data){
@@ -32,6 +36,7 @@ export const ChatPage = () => {
             setUserCurrentMessage("");
             sendMessage({content: userCurrentMessage}).then((data) => {
                 setMessages(messages => [...messages, {role: "assistant", content: data.answer, datetime: "now", id: "123"}]);
+                setRelatedDocuments(() => data.related_documents)
             }, (reason) => {
                 console.log(reason);
             })
@@ -43,6 +48,11 @@ export const ChatPage = () => {
             e.preventDefault();
             sendMessageWrapper();
         }
+    }
+
+    const cleanMessagesWrapper = () => {
+        setRelatedDocuments([]);
+        cleanMessages();
     }
 
 
@@ -66,14 +76,57 @@ export const ChatPage = () => {
                         placeholder="Type your question"
                         rightSectionWidth={42}
                         rightSection={
-                            <ActionIcon loading={isSendMessagePending} size={28} radius="xl" color={"violet"} variant="filled" onClick={sendMessageWrapper}>
-                                <IconArrowRight style={{ width: 24, height: 24 }} stroke={1.5} />
+                            <ActionIcon loaderProps={{type: "oval"}} loading={isSendMessagePending} size={28} radius="xl" color={"violet"} variant="filled" onClick={sendMessageWrapper}>
+                                <IconArrowRight style={{ width: 18, height: 18 }} stroke={1.5} />
                             </ActionIcon>
                         }
                     />
                 </Flex>
-                <div style={{height: "100%", width: "30%"}}>
-                    {/*Related docs*/}
+                <div style={{height: "100%", width: "30%", paddingLeft: "24px", paddingBottom: "4px"}}>
+                    <Flex direction={"column"} h="100%">
+                        <div>
+                            <Title order={3} ta="left">General</Title>
+                            <Text>
+                                In-Tokens: {isLLMSettingsSuccess? 1: 0} <br/>
+                                Out-Tokens: {isLLMSettingsSuccess? 1: 0} <br/>
+                                Model: {isLLMSettingsSuccess? `${llmSettings.vendor}/${llmSettings.model}`: "not selected"}
+                            </Text>
+                        </div>
+                        <Divider mt={12} mb={16}/>
+                        <div>
+                            <Title order={3} ta="left">Related documents</Title>
+                            {
+                                relatedDocuments.length == 0
+                                ? (
+                                    <Text>
+                                        No documents
+                                    </Text>
+                                ): null
+                            }
+                        </div>
+                        <ScrollArea scrollbars="y" style={{flexGrow: 1}}>
+                            <List
+                                spacing="xs"
+                                size="sm"
+                                center
+                                icon={<ThemeIcon color="violet" size={8} radius="xl"/>}
+                            >
+                                {relatedDocuments.map(doc => (
+                                    <List.Item>
+                                        <Text fw={500}>
+                                            {doc}
+                                        </Text>
+                                    </List.Item>
+                                ))}
+                            </List>
+                        </ScrollArea>
+                        <div>
+                            <Divider mb={12}/>
+                            <Button loaderProps={{type: "dots"}} loading={isCleanMessagesPending} onClick={cleanMessagesWrapper}>
+                                Очистить историю
+                            </Button>
+                        </div>
+                    </Flex>
                 </div>
             </Flex>
         </BasicLayout>
