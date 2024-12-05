@@ -14,9 +14,6 @@ sqlalchemy = "^2.0.35"
 asyncpg = "^0.30.0"
 aiosqlite = "^0.20.0"
 sqlmodel = "^0.0.22"
-langchain = "^0.3.7"
-langchain-community = "^0.3.7"
-gigachat = "^0.1.36"
 aiohttp = "^3.11.9"
 
 [tool.poetry.group.dev.dependencies]
