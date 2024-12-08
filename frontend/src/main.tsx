@@ -9,6 +9,7 @@ import router from "./router";
 import './index.css'
 import './reset.css'
 import '@mantine/core/styles.css';
+import '@mantine/charts/styles.css';
 import '@mantine/notifications/styles.css';
 
 

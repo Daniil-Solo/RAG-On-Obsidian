@@ -2,6 +2,7 @@ import {createBrowserRouter} from "react-router-dom";
 import {Page404} from "../pages/404";
 import {ChatPage} from "../pages/chat";
 import {SettingsPage} from "../pages/settings";
+import {IndexPage} from "../pages/index";
 
 
 const router = createBrowserRouter([
@@ -15,6 +16,12 @@ const router = createBrowserRouter([
         path: "/chat",
         element: (
             <ChatPage/>
+        ),
+    },
+    {
+        path: "/index",
+        element: (
+            <IndexPage/>
         ),
     },
     {
