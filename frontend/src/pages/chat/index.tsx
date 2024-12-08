@@ -1,7 +1,7 @@
 import BasicLayout from "../../layouts/basic-layout"
 import MessageHistory from "../../components/message-history"
-import  {ScrollArea, Textarea , ActionIcon, Flex, Button, List, ThemeIcon, Title, Divider, Text } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import  {ScrollArea, Textarea , ActionIcon, Flex, Button, List, ThemeIcon, Title, Divider, Text, Accordion , MantineColor } from '@mantine/core';
+import { IconArrowRight, IconInfoHexagonFilled, IconBookmarksFilled, IconSettingsFilled } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from "react";
 import { useChatMessages, useSendChatMessage, useCleanChatMessage } from "../../hooks/messages";
 import {useLLMSettings} from "../../hooks/settings";
@@ -82,19 +82,24 @@ export const ChatPage = () => {
                         }
                     />
                 </Flex>
-                <div style={{height: "100%", width: "30%", paddingLeft: "24px", paddingBottom: "4px"}}>
-                    <Flex direction={"column"} h="100%">
-                        <div>
-                            <Title order={3} ta="left">General</Title>
+                <Accordion ps={12} multiple={true}  w={"30%"} defaultValue={["General"]} variant="separated">
+                    <Accordion.Item value={"General"}>
+                        <Accordion.Control icon={<IconInfoHexagonFilled color="var(--violet)"/>}>
+                            General
+                        </Accordion.Control>
+                        <Accordion.Panel>
                             <Text>
                                 In-Tokens: {isLLMSettingsSuccess? 1: 0} <br/>
                                 Out-Tokens: {isLLMSettingsSuccess? 1: 0} <br/>
                                 Model: {isLLMSettingsSuccess? `${llmSettings.vendor}/${llmSettings.model}`: "not selected"}
                             </Text>
-                        </div>
-                        <Divider mt={12} mb={16}/>
-                        <div>
-                            <Title order={3} ta="left">Related documents</Title>
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                    <Accordion.Item value={"Related"}>
+                        <Accordion.Control icon={<IconBookmarksFilled color="var(--violet)"/>}>
+                            Related documents
+                        </Accordion.Control>
+                        <Accordion.Panel>
                             {
                                 relatedDocuments.length == 0
                                 ? (
@@ -103,31 +108,35 @@ export const ChatPage = () => {
                                     </Text>
                                 ): null
                             }
-                        </div>
-                        <ScrollArea scrollbars="y" style={{flexGrow: 1}}>
-                            <List
-                                spacing="xs"
-                                size="sm"
-                                center
-                                icon={<ThemeIcon color="violet" size={8} radius="xl"/>}
-                            >
-                                {relatedDocuments.map(doc => (
-                                    <List.Item>
-                                        <Text fw={500}>
-                                            {doc}
-                                        </Text>
-                                    </List.Item>
-                                ))}
-                            </List>
-                        </ScrollArea>
-                        <div>
-                            <Divider mb={12}/>
+                            <ScrollArea scrollbars="y" style={{flexGrow: 1}}>
+                                <List
+                                    spacing="xs"
+                                    size="sm"
+                                    center
+                                    icon={<ThemeIcon color="violet" size={8} radius="xl"/>}
+                                >
+                                    {relatedDocuments.map(doc => (
+                                        <List.Item>
+                                            <Text fw={500}>
+                                                {doc}
+                                            </Text>
+                                        </List.Item>
+                                    ))}
+                                </List>
+                         </ScrollArea>
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                    <Accordion.Item value={"Management"}>
+                        <Accordion.Control icon={<IconSettingsFilled color="var(--violet)"/>}>
+                            Management
+                        </Accordion.Control>
+                        <Accordion.Panel>
                             <Button loaderProps={{type: "dots"}} loading={isCleanMessagesPending} onClick={cleanMessagesWrapper}>
                                 Очистить историю
                             </Button>
-                        </div>
-                    </Flex>
-                </div>
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                </Accordion>
             </Flex>
         </BasicLayout>
     );
