@@ -1,6 +1,6 @@
 import BasicLayout from "../../layouts/basic-layout"
 import MessageHistory from "../../components/message-history"
-import  {ScrollArea, Textarea , ActionIcon, Flex, Button, List, ThemeIcon, Title, Divider, Text, Accordion , MantineColor } from '@mantine/core';
+import  {ScrollArea, Textarea , ActionIcon, Flex, Button, List, ThemeIcon, Text, Accordion } from '@mantine/core';
 import { IconArrowRight, IconInfoHexagonFilled, IconBookmarksFilled, IconSettingsFilled } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from "react";
 import { useChatMessages, useSendChatMessage, useCleanChatMessage } from "../../hooks/messages";
@@ -132,7 +132,7 @@ export const ChatPage = () => {
                         </Accordion.Control>
                         <Accordion.Panel>
                             <Button loaderProps={{type: "dots"}} loading={isCleanMessagesPending} onClick={cleanMessagesWrapper}>
-                                Очистить историю
+                                Clean history
                             </Button>
                         </Accordion.Panel>
                     </Accordion.Item>
