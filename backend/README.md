@@ -23,3 +23,14 @@ poetry run uvicorn src.app:app --port 5000 --reload
 ```bash
 poetry run ruff check src
 ```
+
+### Контейнеризация приложения в Docker
+
+```bash
+docker build -f Dockerfile.prod -t rag-on-obsidian:latest .
+```
+
+### Запуск приложения из Docker-образа
+```bash
+docker run --rm -it -p 5000:5000 -v ./obsidian:/app/obsidian -e OBSIDIAN_PATH='/app/obsidian' -e ORIGINS='http://localhost:5173' --name rag-on-obsidian -d rag-on-obsidian:latest
+```
