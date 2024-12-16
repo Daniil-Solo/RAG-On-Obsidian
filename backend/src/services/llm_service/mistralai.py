@@ -1,29 +1,30 @@
 import json
 import aiohttp
 import logging
-from src.services.llm_checker.base import BaseChecker
+from src.services.llm_service.base import BaseLLMService, LLMException
 
 CHECK_LINK = "https://api.mistral.ai/v1/chat/completions"
 
 logger = logging.getLogger(__name__)
 
 
-class MistralAIChecker(BaseChecker):
-    def __init__(self, model: str, token: str) -> None:
+class MistralAILLMService(BaseLLMService):
+    def __init__(self, model: str, token: str, max_tokens: int) -> None:
         self.model = model
         self.token = token
+        self.max_tokens = max_tokens
 
-    async def check(self) -> tuple[bool, str]:
+    async def _run_with_params(self, query: str, max_tokens: int) -> str:
         async with aiohttp.ClientSession() as client:
             payload = {
                 "model": self.model,
                 "messages": [
                     {
                         "role": "user",
-                        "content": "You"
+                        "content": query
                     }
                 ],
-                "max_tokens": 1
+                "max_tokens": max_tokens
             }
             headers = {
                 'Content-Type': 'application/json',
@@ -35,5 +36,15 @@ class MistralAIChecker(BaseChecker):
                 result = await resp.content.read()
                 print(f"Model response content: {result}")
                 if resp.status != 200:
-                    return False, json.loads(result).get("message")
-        return True, ""
+                    raise LLMException(json.loads(result)["message"])
+        return json.loads(result)["choices"][0]["message"]["content"]
+
+    async def run(self, query: str) -> str:
+        return await self._run_with_params(query, self.max_tokens)
+
+    async def check(self) -> tuple[bool, str]:
+        try:
+            await self._run_with_params("You", 1)
+            return True, ""
+        except LLMException as ex:
+            return False, ex.message
