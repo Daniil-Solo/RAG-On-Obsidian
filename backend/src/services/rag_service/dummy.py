@@ -1,8 +1,8 @@
 import asyncio
-from src.services.rag.base import BaseRag, RagResponse
+from src.services.rag_service.base import BaseRagService, RagResponse
 
 
-class DummyRag(BaseRag):
+class DummyRag(BaseRagService):
 
     async def run(self, user_query: str) -> RagResponse:
         await asyncio.sleep(0.5)

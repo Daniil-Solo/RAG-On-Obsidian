@@ -2,7 +2,7 @@ import json
 import aiohttp
 import logging
 import ssl
-from src.services.llm_checker.base import BaseChecker
+from src.services.llm_service.base import BaseLLMService, LLMException
 
 AUTH_LINK = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
 CHECK_LINK = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
@@ -10,12 +10,13 @@ CHECK_LINK = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 logger = logging.getLogger(__name__)
 
 
-class GigaChatChecker(BaseChecker):
-    def __init__(self, model: str, auth_token: str) -> None:
+class GigaChatLLMService(BaseLLMService):
+    def __init__(self, model: str, auth_token: str, max_tokens: int) -> None:
         self.model = model
         self.auth_token = auth_token
+        self.max_tokens = max_tokens
 
-    async def check(self) -> tuple[bool, str]:
+    async def _run_with_params(self, query: str, max_tokens: int) -> str:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
@@ -35,20 +36,20 @@ class GigaChatChecker(BaseChecker):
                 result = await resp.content.read()
                 print(f"Auth response content: {result}")
                 if resp.status != 200:
-                    return False, json.loads(result).get("message")
+                    raise LLMException(message=json.loads(result)["message"])
                 access_token = json.loads(result).get("access_token")
 
             check_payload = {
                 "model": self.model,
                 "messages": [
                     {
-                      "role": "system",
-                      "content": "Ты"
+                        "role": "system",
+                        "content": query
                     }
                 ],
                 "stream": False,
                 "update_interval": 0,
-                "max_tokens": 1
+                "max_tokens": max_tokens
             }
             check_headers = {
                 'Content-Type': 'application/json',
@@ -60,5 +61,15 @@ class GigaChatChecker(BaseChecker):
                 result = await resp.content.read()
                 print(f"Model response content: {result}")
                 if resp.status != 200:
-                    return False, json.loads(result).get("message")
-        return True, ""
+                    raise LLMException(message=json.loads(result)["message"])
+        return json.loads(result)["choices"][0]["message"]["content"]
+
+    async def run(self, query: str) -> str:
+        return await self._run_with_params(query, self.max_tokens)
+
+    async def check(self) -> tuple[bool, str]:
+        try:
+            await self._run_with_params("Ты", 1)
+            return True, ""
+        except LLMException as ex:
+            return False, ex.message
