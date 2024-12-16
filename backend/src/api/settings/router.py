@@ -13,7 +13,7 @@ settings_router = APIRouter(prefix="/settings", tags=["settings"])
 
 
 @settings_router.get(
-    "/llm",
+    "/llm/",
     response_model=LLMSettingsResponse,
     responses={
         HTTPStatus.OK: {
@@ -36,7 +36,7 @@ async def get_llm_settings(
     return LLMSettingsResponse(**llm_settings_dict)
 
 
-@settings_router.put("/llm")
+@settings_router.put("/llm/")
 async def post_user_message(
     llm_settings: LLMSettingsRequest,
     settings_repo: Annotated[SettingsRepository, Depends(get_settings_repository)],
@@ -52,7 +52,7 @@ async def post_user_message(
 
 
 @settings_router.post(
-    "/llm/checking",
+    "/llm/checking/",
     responses={
         HTTPStatus.OK: {
             "description": "Successfully check LLM availability",

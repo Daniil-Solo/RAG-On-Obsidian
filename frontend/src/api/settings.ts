@@ -3,8 +3,8 @@ import {LLMSettingsRequest, LLMSettingsResponse, LLMAvailabilityResponse} from "
 import { MessageResponse } from "../types/general";
 
 
-const API_SETTINGS_LLM = '/api/settings/llm';
-const API_SETTINGS_LLM_CHECK = `${API_SETTINGS_LLM}/checking`;
+const API_SETTINGS_LLM = '/api/settings/llm/';
+const API_SETTINGS_LLM_CHECK = `${API_SETTINGS_LLM}checking/`;
 
 
 const checkLLMAvailability = async (data: LLMSettingsRequest) => {
