@@ -14,9 +14,9 @@ def add_single_page_application_endpoints(application: FastAPI, static_dir: str)
         else:
             return await http_exception_handler(req, exc)
 
-    @application.get("/favicon.svg")
+    @application.get("/favicon.ico")
     def get_favicon():
-        return FileResponse(f'{static_dir}/favicon.svg', media_type='image/svg+xm')
+        return FileResponse(f'{static_dir}/favicon.ico', media_type='image/x-icon')
 
     application.mount(
         '/assets/',
