@@ -13,11 +13,6 @@ npm run dev
 ```
 
 ### Сборка
-Переменные окружения
-```env
-VITE_FAVICON_URL=/favicon.ico
-```
-
 Команда
 ```bash
 npm run build
