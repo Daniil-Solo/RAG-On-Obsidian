@@ -66,7 +66,7 @@ export const SettingsPage = () => {
                                     variant="filled"
                                     size="sm"
                                     w="100%"
-                                    label="API Token"
+                                    label={llmSettings.vendor === "GigaChat" ? "Auth Token": "API Token"}
                                     placeholder="Input here"
                                     value={llmSettings.token}
                                     onChange={e => setLLMSettings({...llmSettings, token: e.target.value})}
