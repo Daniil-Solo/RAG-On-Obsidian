@@ -1,4 +1,4 @@
-# Бэкенд часть проекта
+# API
 
 ## Локальная разработка
 
@@ -24,13 +24,20 @@ poetry run uvicorn src.app:app --port 5000 --reload
 poetry run ruff check src
 ```
 
-### Контейнеризация приложения в Docker
+### Сборка Docker-образа для API-сервиса
 
 ```bash
-docker build -f Dockerfile.prod -t rag-on-obsidian:latest .
+docker build -f Dockerfile -t ragobs-api:latest .
 ```
 
 ### Запуск приложения из Docker-образа
 ```bash
-docker run --rm -it -p 5000:5000 -v ./obsidian:/app/obsidian -e OBSIDIAN_PATH='/app/obsidian' -e ORIGINS='http://localhost:5173' --name rag-on-obsidian -d rag-on-obsidian:latest
+docker run --rm -it -p 5000:5000 -v ./obsidian:/app/obsidian -e OBSIDIAN_PATH='/app/obsidian' -e ORIGINS='http://localhost:5173' --name ragobs-api -d ragobs-api:latest
+```
+
+### Qdrant Docker
+
+```bash
+docker pull qdrant/qdrant
+docker run -p 6333:6333 -p 6334:6334 -v ./qdrant_storage:/qdrant/storage:z qdrant/qdrant
 ```

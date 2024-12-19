@@ -1,5 +1,5 @@
 from enum import Enum
-
+from typing import Optional
 from pydantic import DirectoryPath, Field, FilePath
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,6 +15,8 @@ class ApplicationConfig(BaseSettings):
     MODE: ApplicationMode = Field(default=ApplicationMode.DEBUG)
     DB_PATH: str = Field(default="./rag_on_obsidian.db")
     ORIGINS: str = Field(default="")
+    STATIC_PATH: Optional[str] = Field(default=None)
+    QDRANT_URL: str = Field()
 
     @property
     def is_debug(self) -> bool:

@@ -8,7 +8,7 @@ class RagResponse:
     related_documents: list[str]
 
 
-class BaseRag(ABC):
+class BaseRagService(ABC):
 
     @abstractmethod
     async def run(self, user_query: str) -> RagResponse:

@@ -1,0 +1,13 @@
+:root {
+  --dark: #151515;
+  --light: #f0eff2;
+  --grey: #8a8594;
+  --light-violet: #e7def8;
+  --violet: #7853C1;
+  --dark-violet: #5D34B0;
+}
+
+#root{
+  width: 100%;
+  min-height: 100vh;
+}

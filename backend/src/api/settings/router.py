@@ -7,13 +7,13 @@ from src.api.general_schemas import MessageResponse
 from src.api.settings.dependencies import get_settings_repository
 from src.api.settings.schemas import LLMAvailabilityResponse, LLMSettingsRequest, LLMSettingsResponse
 from src.repositories.settings.interface import SettingsRepository
-from src.services.llm_checker.builder import LLMCheckerBuilder
+from src.services.llm_service.builder import LLMServiceBuilder
 
 settings_router = APIRouter(prefix="/settings", tags=["settings"])
 
 
 @settings_router.get(
-    "/llm",
+    "/llm/",
     response_model=LLMSettingsResponse,
     responses={
         HTTPStatus.OK: {
@@ -36,7 +36,7 @@ async def get_llm_settings(
     return LLMSettingsResponse(**llm_settings_dict)
 
 
-@settings_router.put("/llm")
+@settings_router.put("/llm/")
 async def post_user_message(
     llm_settings: LLMSettingsRequest,
     settings_repo: Annotated[SettingsRepository, Depends(get_settings_repository)],
@@ -52,7 +52,7 @@ async def post_user_message(
 
 
 @settings_router.post(
-    "/llm/checking",
+    "/llm/checking/",
     responses={
         HTTPStatus.OK: {
             "description": "Successfully check LLM availability",
@@ -66,13 +66,13 @@ async def check_llm_availability(
     llm_settings: LLMSettingsRequest,
 ) -> LLMAvailabilityResponse:
     try:
-        llm_checker = LLMCheckerBuilder.build(
-            llm_settings.vendor, llm_settings.model, llm_settings.token, llm_settings.base_url
+        llm_service = LLMServiceBuilder.build(
+            llm_settings.vendor, llm_settings.model, llm_settings.token, llm_settings.base_url, llm_settings.max_tokens
         )
     except NotImplementedError as err:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail=f"Requested LLM type {llm_settings.vendor} was not found",
         ) from err
-    is_available, error_message = await llm_checker.check()
+    is_available, error_message = await llm_service.check()
     return LLMAvailabilityResponse(is_available=is_available, error_message=error_message)
