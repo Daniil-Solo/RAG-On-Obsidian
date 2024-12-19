@@ -26,8 +26,8 @@ class LLMTokensSQLAlchemyRepository(LLMTokensRepository):
             statement = (
                 update(LLMTokensModel)
                 .values(
-                    input_tokens=input_tokens,
-                    output_tokens=output_tokens,
+                    input_tokens=LLMTokensModel.input_tokens + input_tokens,
+                    output_tokens=LLMTokensModel.output_tokens + output_tokens,
                 )
             )
             await self.session.execute(statement)
