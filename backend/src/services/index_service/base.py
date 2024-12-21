@@ -23,5 +23,5 @@ class BaseIndexService(ABC):
         raise NotImplementedError("This method should be implemented")
     
     @abstractmethod
-    async def update(self, files: list[str]) -> None:
+    async def update(self, files: list[dict]) -> None:
         raise NotImplementedError("This method should be implemented")
