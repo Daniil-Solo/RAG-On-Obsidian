@@ -3,6 +3,7 @@ from fastapi import FastAPI
 
 from src.api.messages.router import messages_router
 from src.api.settings.router import settings_router
+from src.api.index.router import index_router
 from src.config import app_config
 from src.utils.fastapi_docs import add_custom_docs_endpoints
 from src.utils.fastapi_cors import add_cors
@@ -20,6 +21,7 @@ async def lifespan(application: FastAPI):
 def add_routers(application: FastAPI, prefix: str = "") -> None:
     application.include_router(messages_router, prefix=prefix)
     application.include_router(settings_router, prefix=prefix)
+    application.include_router(index_router, prefix=prefix)
 
 
 def create_application() -> FastAPI:

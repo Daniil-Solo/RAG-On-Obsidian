@@ -26,6 +26,24 @@ class LLMSettingsModel(SQLModel, table=True):
     max_tokens: int = Field(..., nullable=False)
 
 
+class FileModel(SQLModel, table=True):
+    __tablename__ = "files"
+
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(..., nullable=False)
+    size: int = Field(..., nullable=False)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    x: float = Field(..., nullable=False)
+    y: float = Field(..., nullable=False)
+
+
+class IndexInfoModel(SQLModel, table=True):
+    __tablename__ = "index_info"
+
+    id: int = Field(default=None, primary_key=True)
+    last_update_time: datetime = Field(..., nullable=False)
+
+
 # Before all models
 metadata = SQLModel.metadata
 engine = create_engine(url=app_config.sync_db_url, echo=True)

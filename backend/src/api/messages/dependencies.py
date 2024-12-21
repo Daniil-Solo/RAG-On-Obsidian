@@ -46,4 +46,3 @@ def get_rag_service(
         llm_service: Annotated[BaseLLMService, Depends(get_llm_service)],
 ) -> BaseRagService:
     return DemoQdrantRagService(qdrant_url=app_config.QDRANT_URL, llm=llm_service)
-
