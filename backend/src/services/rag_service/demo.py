@@ -1,11 +1,15 @@
 import os
 import logging
 from uuid import uuid4
+
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.http.models import VectorParams, PointStruct
 from qdrant_client.http.models import Distance
+from qdrant_client.http.models import Filter, FieldCondition, MatchValue
 from sentence_transformers import SentenceTransformer
 from langchain.text_splitter import CharacterTextSplitter
+from sklearn.decomposition import PCA
+import numpy as np
 
 from src.services.rag_service.base import BaseRagService, RagResponse
 from src.services.llm_service.base import BaseLLMService
@@ -85,16 +89,41 @@ class DemoQdrantRagService(BaseRagService):
                 await self._add_document(root, filename, text_splitter, sentence_embedder)
                 logger.info(f"Document {filename} has been processed successfully")
 
-    async def _add_document(self, root: str, filename: str, text_splitter: CustomTextSplitter, sentence_embedder: SentenceTransformer):
+    async def _add_document(self, root: str, filename: str, text_splitter: CustomTextSplitter, sentence_embedder: SentenceTransformer) -> np.ndarray:
         file_path = os.path.join(root, filename)
+        embeddings = []
+
         with open(file_path, 'r') as file:
             content = file.read()
-            text_fragments = text_splitter.split_text(content)
-            points = [
-                PointStruct(id=str(uuid4()), vector=sentence_embedder.encode(filename[:-3] + " " + fragment), payload={'filename': filename, 'text': fragment})
-                for fragment in text_fragments
+
+        text_fragments = text_splitter.split_text(content)
+        points = []
+
+        for fragment in text_fragments:
+            embedding = sentence_embedder.encode(filename[:-3] + " " + fragment)
+            embeddings.append(embedding)
+            points.append(PointStruct(id=str(uuid4()), vector=embedding, payload={'filename': filename, 'text': fragment}))
+
+        if len(points) == 0:
+            return np.zeros((1, EMBEDDINGS_MODEL_SIZE), dtype=np.float32)
+
+        await self.qdrant_client.upsert(collection_name=QDRANT_COLLECTION_NAME, points=points)
+        return np.mean(embeddings, axis=0).reshape(1, -1)
+        
+
+    async def _remove_document(self, filename: str):
+        points_selector = Filter(
+            must=[
+                FieldCondition(
+                    key="filename",
+                    match=MatchValue(value=filename),
+                )
             ]
-            await self.qdrant_client.upsert(collection_name=QDRANT_COLLECTION_NAME, points=points)
+        )
+        await self.qdrant_client.delete(
+            collection_name=QDRANT_COLLECTION_NAME,
+            points_selector=points_selector
+        )
 
     async def _retrieve(self, query, k=5):
         sentence_embedder = SentenceTransformer(EMBEDDINGS_MODEL_NAME)
@@ -122,3 +151,32 @@ class DemoQdrantRagService(BaseRagService):
         """
         answer = await self.llm.run(prompt)
         return RagResponse(answer=answer, related_documents=list(related_documents))
+
+    async def update(self, files_to_update: list[str]) -> list[dict]:
+        sentence_embedder = SentenceTransformer(EMBEDDINGS_MODEL_NAME)
+        text_splitter = CustomTextSplitter()
+        pca = PCA(n_components=2)
+
+        results = []
+        embeddings = []
+
+        for file_path in files_to_update:
+            filename = os.path.basename(file_path)
+            if os.path.exists(file_path):
+                await self._remove_document(file_path)
+                embedding = await self._add_document(os.path.dirname(file_path), filename, text_splitter, sentence_embedder)
+                embeddings.append(embedding)
+                results.append({"file_path": file_path})
+                logger.info(f"Document {filename} has been updated successfully")
+            else:
+                await self._remove_document(filename)
+                logger.info(f"Document {filename} has been removed successfully")
+
+        if len(embeddings) > 0:  # TODO: does not work correctly if only one file updated
+            embeddings = np.stack(embeddings, axis=0).squeeze()
+            pca_result = pca.fit_transform(embeddings)
+            for i in range(len(results)):
+                results[i]["x"] = float(pca_result[i, 0])
+                results[i]["y"] = float(pca_result[i, 1])
+
+        return results
