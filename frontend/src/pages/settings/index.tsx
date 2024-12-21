@@ -41,7 +41,7 @@ export const SettingsPage = () => {
                     <Tabs.Panel value="llm">
                         <Stack ps={24}>
                             <Box pos="relative">
-                                <LoadingOverlay visible={isCheckPending} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: 'violet', type: 'dots' }} />
+                                <LoadingOverlay visible={isCheckPending} zIndex={1000} overlayProps={{ radius: "sm", blur: 0 }} loaderProps={{ color: 'violet', type: 'dots' }} />
                                 <Select 
                                     variant="filled"
                                     size="sm"

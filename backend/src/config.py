@@ -16,7 +16,7 @@ class ApplicationConfig(BaseSettings):
     DB_PATH: str = Field(default="./rag_on_obsidian.db")
     ORIGINS: str = Field(default="")
     STATIC_PATH: Optional[str] = Field(default=None)
-    QDRANT_URL: str = Field()
+    QDRANT_URL: Optional[str] = Field(default=None)
 
     @property
     def is_debug(self) -> bool:

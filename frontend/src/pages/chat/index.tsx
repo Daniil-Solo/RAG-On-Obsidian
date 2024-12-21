@@ -5,6 +5,7 @@ import { IconArrowRight, IconInfoHexagonFilled, IconBookmarksFilled, IconSetting
 import { useEffect, useRef, useState } from "react";
 import { useChatMessages, useSendChatMessage, useCleanChatMessage } from "../../hooks/messages";
 import {useLLMSettings} from "../../hooks/settings";
+import {useLLMTokens} from "../../hooks/llm-tokens";
 import { MessageSchema } from "../../types/messages";
 
 
@@ -16,6 +17,7 @@ export const ChatPage = () => {
     const [userCurrentMessage, setUserCurrentMessage] = useState("");
     const [relatedDocuments, setRelatedDocuments] = useState<Array<string>>([]);
     const {data, isSuccess} = useChatMessages();
+    const {data: llmTokens, isSuccess: isLLMTokensSuccess} = useLLMTokens();
     const {data: llmSettings, isSuccess: isLLMSettingsSuccess} = useLLMSettings();
     const {mutateAsync: sendMessage, isPending: isSendMessagePending} = useSendChatMessage();
     const {mutateAsync: cleanMessages, isPending: isCleanMessagesPending} = useCleanChatMessage();
@@ -89,9 +91,9 @@ export const ChatPage = () => {
                         </Accordion.Control>
                         <Accordion.Panel>
                             <Text>
-                                In-Tokens: {isLLMSettingsSuccess? 1: 0} <br/>
-                                Out-Tokens: {isLLMSettingsSuccess? 1: 0} <br/>
-                                Model: {isLLMSettingsSuccess? `${llmSettings.vendor}/${llmSettings.model}`: "not selected"}
+                                In-Tokens: {isLLMTokensSuccess? llmTokens.input_tokens: "no data"} <br/>
+                                Out-Tokens: {isLLMTokensSuccess? llmTokens.output_tokens: "no data"} <br/>
+                                Model: {isLLMSettingsSuccess && llmSettings.model !== ''? llmSettings.model: "not selected"}
                             </Text>
                         </Accordion.Panel>
                     </Accordion.Item>
@@ -132,7 +134,7 @@ export const ChatPage = () => {
                         </Accordion.Control>
                         <Accordion.Panel>
                             <Button loaderProps={{type: "dots"}} loading={isCleanMessagesPending} onClick={cleanMessagesWrapper}>
-                                Clean history
+                                Clear history
                             </Button>
                         </Accordion.Panel>
                     </Accordion.Item>

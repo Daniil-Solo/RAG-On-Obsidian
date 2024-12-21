@@ -8,6 +8,8 @@ from src.api.settings.dependencies import get_settings_repository
 from src.api.settings.schemas import LLMAvailabilityResponse, LLMSettingsRequest, LLMSettingsResponse
 from src.repositories.settings.interface import SettingsRepository
 from src.services.llm_service.builder import LLMServiceBuilder
+from src.api.general_dependencies import get_llm_tokens_repository
+from src.repositories.llm_tokens.interface import LLMTokensRepository
 
 settings_router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -40,6 +42,7 @@ async def get_llm_settings(
 async def post_user_message(
     llm_settings: LLMSettingsRequest,
     settings_repo: Annotated[SettingsRepository, Depends(get_settings_repository)],
+llm_tokens_repository: Annotated[LLMTokensRepository, Depends(get_llm_tokens_repository)],
 ) -> MessageResponse:
     await settings_repo.update_llm_settings(
         vendor=llm_settings.vendor,
@@ -48,6 +51,7 @@ async def post_user_message(
         base_url=llm_settings.base_url,
         max_tokens=llm_settings.max_tokens,
     )
+    await llm_tokens_repository.clean()
     return MessageResponse(message="LLM Settings updated successfully")
 
 
