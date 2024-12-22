@@ -10,39 +10,38 @@ class FileSQLAlchemyRepository(FileRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def add(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> dict:
+    async def add(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> None:
         file_record = FileModel(name=name, size=size, updated_at=updated_at, x=x, y=y)
         self.session.add(file_record)
         await self.session.commit()
-        await self.session.refresh(file_record)
-        return file_record.model_dump()
 
-    async def update(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> dict:
+    async def update(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> None:
         statement = select(FileModel).where(FileModel.name == name)
         results = await self.session.execute(statement)
         file_record = results.first()
 
-        await self._update_index_info(updated_at)
+        await self._update_index_info(datetime.utcnow())
         if file_record is None:
-            return await self.add(
+            await self.add(
                 name=name,
                 size=size,
                 updated_at=updated_at,
                 x=x,
                 y=y,
             )
-
-        file_record.name = name
-        file_record.size = size
-        file_record.updated_at = updated_at
-        file_record.x = x
-        file_record.y = y
-
-        self.session.add(file_record)
-        await self.session.commit()
-        await self.session.refresh(file_record)
-
-        return file_record.model_dump()
+        else:
+            statement = (
+                update(FileModel)
+                .values(
+                    name=name,
+                    size=size,
+                    updated_at=updated_at,
+                    x=x,
+                    y=y,
+                )
+            )
+            await self.session.execute(statement)
+            await self.session.commit()
 
     async def get_index_info(self) -> dict | None:
         statement = select(IndexInfoModel)
@@ -72,7 +71,5 @@ class FileSQLAlchemyRepository(FileRepository):
         else:
             statement = update(IndexInfoModel).values(last_update_time=last_update_time)
             await self.session.execute(statement)
-
-        print("Update index info")
 
         await self.session.commit()

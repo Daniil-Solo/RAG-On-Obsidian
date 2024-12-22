@@ -1,5 +1,6 @@
 import os
 import logging
+from collections import defaultdict
 from uuid import uuid4
 
 from qdrant_client import AsyncQdrantClient
@@ -91,7 +92,6 @@ class DemoQdrantRagService(BaseRagService):
 
     async def _add_document(self, root: str, filename: str, text_splitter: CustomTextSplitter, sentence_embedder: SentenceTransformer) -> np.ndarray:
         file_path = os.path.join(root, filename)
-        embeddings = []
 
         with open(file_path, 'r') as file:
             content = file.read()
@@ -101,14 +101,12 @@ class DemoQdrantRagService(BaseRagService):
 
         for fragment in text_fragments:
             embedding = sentence_embedder.encode(filename[:-3] + " " + fragment)
-            embeddings.append(embedding)
-            points.append(PointStruct(id=str(uuid4()), vector=embedding, payload={'filename': filename, 'text': fragment}))
+            points.append(PointStruct(id=str(uuid4()), vector=embedding, payload={'file_path': file_path, 'filename': filename, 'text': fragment}))
 
         if len(points) == 0:
             return np.zeros((1, EMBEDDINGS_MODEL_SIZE), dtype=np.float32)
 
         await self.qdrant_client.upsert(collection_name=QDRANT_COLLECTION_NAME, points=points)
-        return np.mean(embeddings, axis=0).reshape(1, -1)
         
 
     async def _remove_document(self, filename: str):
@@ -157,26 +155,60 @@ class DemoQdrantRagService(BaseRagService):
         text_splitter = CustomTextSplitter()
         pca = PCA(n_components=2)
 
-        results = []
-        embeddings = []
-
+        # Update specified files
         for file_path in files_to_update:
             filename = os.path.basename(file_path)
             if os.path.exists(file_path):
-                await self._remove_document(file_path)
-                embedding = await self._add_document(os.path.dirname(file_path), filename, text_splitter, sentence_embedder)
-                embeddings.append(embedding)
-                results.append({"file_path": file_path})
+                # Remove old data and add updated data
+                await self._remove_document(filename)
+                await self._add_document(os.path.dirname(file_path), filename, text_splitter, sentence_embedder)
                 logger.info(f"Document {filename} has been updated successfully")
             else:
+                # Remove document if it no longer exists
                 await self._remove_document(filename)
                 logger.info(f"Document {filename} has been removed successfully")
 
-        if len(embeddings) > 0:  # TODO: does not work correctly if only one file updated
-            embeddings = np.stack(embeddings, axis=0).squeeze()
-            pca_result = pca.fit_transform(embeddings)
-            for i in range(len(results)):
-                results[i]["x"] = float(pca_result[i, 0])
-                results[i]["y"] = float(pca_result[i, 1])
+        # Retrieve all existing embeddings from the database
+        embeddings_by_file = defaultdict(list)
+        offset = None
+        while True:
+            all_points, offset = await self.qdrant_client.scroll(
+                collection_name=QDRANT_COLLECTION_NAME,
+                with_vectors=True,
+                with_payload=True,
+                offset=offset,
+            )
+
+            # Group embeddings by filename
+            for point in all_points:
+                file_path = point.payload["file_path"]
+                vector = point.vector
+                embeddings_by_file[file_path].append(vector)
+
+            if offset is None:
+                break
+
+        # Compute the mean embedding for each file
+        mean_embeddings = []
+        file_pathes = []
+        for file_path, vectors in embeddings_by_file.items():
+            mean_vector = np.mean(vectors, axis=0)
+            mean_embeddings.append(mean_vector)
+            file_pathes.append(file_path)
+
+        mean_embeddings = np.array(mean_embeddings)
+
+        # Apply PCA
+        results = []
+        if len(mean_embeddings) > 0:
+            pca_result = pca.fit_transform(mean_embeddings)
+
+            # Create results for all files
+            for i, file_path in enumerate(file_pathes):
+                results.append({
+                    "file_path": file_path,
+                    "x": float(pca_result[i, 0]),
+                    "y": float(pca_result[i, 1]),
+                })
 
         return results

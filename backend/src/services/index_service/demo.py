@@ -62,10 +62,10 @@ class DemoIndexService(BaseIndexService):
 
     async def remove(self) -> None:
         pass
-        # self.index = {"last_updated": None, "files": {}}
-        # self._save_index()
 
     async def update(self, files: list[dict]) -> None:
+        await self.remove()
+
         for file in files:
             await self.file_repository.update(
                 name=file["file_path"],
