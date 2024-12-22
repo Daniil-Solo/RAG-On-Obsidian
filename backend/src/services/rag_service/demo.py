@@ -92,7 +92,7 @@ class DemoQdrantRagService(BaseRagService):
         SentenceTransformer(EMBEDDINGS_MODEL_NAME)
         logger.info(f"Sentence transformer {EMBEDDINGS_MODEL_NAME} has been downloaded successfully")
 
-    async def _add_document(self, root: str, filename: str, text_splitter: CustomTextSplitter, sentence_embedder: SentenceTransformer) -> np.ndarray:
+    async def _add_document(self, root: str, filename: str, text_splitter: CustomTextSplitter, sentence_embedder: SentenceTransformer) -> None:
         file_path = os.path.join(root, filename)
 
         with open(file_path, 'r') as file:
