@@ -24,6 +24,36 @@ class LLMSettingsModel(SQLModel, table=True):
     max_tokens: int = Field(..., nullable=False)
 
 
+class FileModel(SQLModel, table=True):
+    __tablename__ = "files"
+
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(..., nullable=False)
+    size: int = Field(..., nullable=False)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    x: float = Field(..., nullable=False)
+    y: float = Field(..., nullable=False)
+
+
+class UpdateProcessModel(SQLModel, table=True):
+    __tablename__ = "update_process"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    finished_at: Optional[datetime] = Field(default=None)
+    is_actual: bool = Field(default=True)
+
+
+class ProgressStageModel(SQLModel, table=True):
+    __tablename__ = "progress_stage"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(..., nullable=False)
+    progress: int = Field(..., nullable=False)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    finished_at: Optional[datetime] = Field(default=None)
+
+
 class LLMTokensModel(SQLModel, table=True):
     __tablename__ = "llm_tokens"
 
