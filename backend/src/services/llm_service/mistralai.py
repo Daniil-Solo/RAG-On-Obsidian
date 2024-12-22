@@ -34,11 +34,15 @@ class MistralAILLMService(BaseLLMService):
                 "Authorization": f"Bearer {self.token}"
             }
             async with client.post(CHECK_LINK, json=payload, headers=headers) as resp:
-                print(f"Model response status code: {resp.status}")
+                logger.info(f"Model response status code: {resp.status}")
                 result = await resp.content.read()
-                print(f"Model response content: {result}")
+                logger.info(f"Model response content: {result}")
                 if resp.status != 200:
-                    raise LLMException(json.loads(result)["message"])
+                    try:
+                        error_message = json.loads(result)["message"]
+                        raise LLMException(error_message)
+                    except json.decoder.JSONDecodeError:
+                        raise LLMException(result.decode("utf-8"))
         result_dict = json.loads(result)
         self.input_tokens += result_dict["usage"]["prompt_tokens"]
         self.output_tokens += result_dict["usage"]["completion_tokens"]

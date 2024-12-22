@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 
 from src.api.messages.router import messages_router
@@ -8,6 +9,9 @@ from src.utils.fastapi_docs import add_custom_docs_endpoints
 from src.utils.fastapi_cors import add_cors
 from src.utils.fastapi_spa import add_single_page_application_endpoints
 from src.utils.fastapi_lifespan import lifespan
+
+
+logging.basicConfig(level=logging.DEBUG if app_config.is_debug else logging.INFO)
 
 
 def add_routers(application: FastAPI, prefix: str = "") -> None:
