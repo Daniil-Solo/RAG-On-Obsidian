@@ -89,13 +89,8 @@ class DemoQdrantRagService(BaseRagService):
             ),
         )
         logger.info(f"Collection {QDRANT_COLLECTION_NAME} has been created successfully")
-        sentence_embedder = SentenceTransformer(EMBEDDINGS_MODEL_NAME)
+        SentenceTransformer(EMBEDDINGS_MODEL_NAME)
         logger.info(f"Sentence transformer {EMBEDDINGS_MODEL_NAME} has been downloaded successfully")
-        text_splitter = CustomTextSplitter()
-        for root, _, files in os.walk(obsidian_path):
-            for filename in filter(lambda name: name.endswith(".md"), files):
-                await self._add_document(root, filename, text_splitter, sentence_embedder)
-                logger.info(f"Document {filename} has been processed successfully")
 
     async def _add_document(self, root: str, filename: str, text_splitter: CustomTextSplitter, sentence_embedder: SentenceTransformer) -> np.ndarray:
         file_path = os.path.join(root, filename)
@@ -224,7 +219,7 @@ class DemoQdrantRagService(BaseRagService):
                     "x": float(pca_result[i, 0]),
                     "y": float(pca_result[i, 1]),
                 })
-
+            logger.info(f"PCA over embeddings calculated successfully")
         return results
 
     async def remove(self) -> None:
