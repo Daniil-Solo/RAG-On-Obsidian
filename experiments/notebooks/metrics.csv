@@ -39,3 +39,7 @@ AP_K,embedder_name,metric_name,chunk_size
 0.7057142857142857,cointegrated/LaBSE-en-ru,cosine,1024
 0.6742857142857144,cointegrated/LaBSE-en-ru,cosine,1536
 0.7085714285714286,cointegrated/LaBSE-en-ru,cosine,2048
+0.936190476190476,mistral-embed,cosine,512
+0.9361904761904761,mistral-embed,cosine,1024
+0.9347619047619048,mistral-embed,cosine,1536
+0.951904761904762,mistral-embed,cosine,2048
