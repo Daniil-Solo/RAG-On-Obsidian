@@ -37,11 +37,23 @@ class FileModel(SQLModel, table=True):
     y: float = Field(..., nullable=False)
 
 
-class IndexInfoModel(SQLModel, table=True):
-    __tablename__ = "index_info"
+class UpdateProcessModel(SQLModel, table=True):
+    __tablename__ = "update_process"
 
-    id: int = Field(default=None, primary_key=True)
-    last_update_time: datetime = Field(..., nullable=False)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    finished_at: Optional[datetime] = Field(default=None)
+    is_actual: bool = Field(default=True)
+
+
+class ProgressStageModel(SQLModel, table=True):
+    __tablename__ = "progress_stage"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(..., nullable=False)
+    progress: int = Field(..., nullable=False)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    finished_at: Optional[datetime] = Field(default=None)
 
 
 # Before all models

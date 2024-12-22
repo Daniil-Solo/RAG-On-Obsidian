@@ -26,6 +26,6 @@ class ClustersResponse(BaseModel):
         )
 
 
-class IndexationProgressResponse(BaseModel):
+class IndexProgressResponse(BaseModel):
     name: str
     value: int

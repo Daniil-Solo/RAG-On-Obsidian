@@ -11,10 +11,6 @@ class BaseIndexService(ABC):
         raise NotImplementedError("This method should be implemented")
 
     @abstractmethod
-    async def get_last_updated_process(self) -> dict:
-        raise NotImplementedError("This method should be implemented")
-
-    @abstractmethod
     async def get_clusters(self) -> list[dict]:
         raise NotImplementedError("This method should be implemented")
 

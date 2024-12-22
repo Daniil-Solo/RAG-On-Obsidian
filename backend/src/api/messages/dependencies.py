@@ -11,7 +11,9 @@ from src.services.rag_service.demo import DemoQdrantRagService
 from src.services.llm_service.base import BaseLLMService
 from src.services.llm_service.builder import LLMServiceBuilder
 from src.api.settings.dependencies import get_settings_repository
+from src.api.index.dependencies import get_update_progress_repository
 from src.repositories.settings.interface import SettingsRepository
+from src.repositories.index.interface import UpdateProgressRepository
 from src.config import app_config
 from fastapi import HTTPException
 from http import HTTPStatus
@@ -44,5 +46,10 @@ async def get_llm_service(
 
 def get_rag_service(
         llm_service: Annotated[BaseLLMService, Depends(get_llm_service)],
+    update_progress_repository: Annotated[UpdateProgressRepository, Depends(get_update_progress_repository)],
 ) -> BaseRagService:
-    return DemoQdrantRagService(qdrant_url=app_config.QDRANT_URL, llm=llm_service)
+    return DemoQdrantRagService(
+        qdrant_url=app_config.QDRANT_URL,
+        llm=llm_service,
+        update_progress_repository=update_progress_repository,
+    )

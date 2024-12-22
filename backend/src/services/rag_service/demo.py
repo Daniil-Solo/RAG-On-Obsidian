@@ -12,6 +12,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from sklearn.decomposition import PCA
 import numpy as np
 
+from src.repositories.index.interface import UpdateProgressRepository
 from src.services.rag_service.base import BaseRagService, RagResponse
 from src.services.llm_service.base import BaseLLMService
 
@@ -66,9 +67,15 @@ class CustomTextSplitter:
 
 class DemoQdrantRagService(BaseRagService):
 
-    def __init__(self, qdrant_url: str, llm: BaseLLMService = None):
+    def __init__(
+        self,
+        qdrant_url: str,
+        update_progress_repository: UpdateProgressRepository | None = None,
+        llm: BaseLLMService = None,
+    ):
         self.qdrant_client = AsyncQdrantClient(qdrant_url)
         self.llm = llm
+        self.update_progress_repository = update_progress_repository
 
     async def create_vectordb(self, obsidian_path: str):
         if await self.qdrant_client.collection_exists(QDRANT_COLLECTION_NAME):
@@ -107,7 +114,6 @@ class DemoQdrantRagService(BaseRagService):
             return np.zeros((1, EMBEDDINGS_MODEL_SIZE), dtype=np.float32)
 
         await self.qdrant_client.upsert(collection_name=QDRANT_COLLECTION_NAME, points=points)
-        
 
     async def _remove_document(self, filename: str):
         points_selector = Filter(
@@ -156,7 +162,8 @@ class DemoQdrantRagService(BaseRagService):
         pca = PCA(n_components=2)
 
         # Update specified files
-        for file_path in files_to_update:
+        stage_id = await self.update_progress_repository.start_progress_stage(name="vectorization")
+        for idx, file_path in enumerate(files_to_update):
             filename = os.path.basename(file_path)
             if os.path.exists(file_path):
                 # Remove old data and add updated data
@@ -167,6 +174,12 @@ class DemoQdrantRagService(BaseRagService):
                 # Remove document if it no longer exists
                 await self._remove_document(filename)
                 logger.info(f"Document {filename} has been removed successfully")
+
+            await self.update_progress_repository.update_progress_stage(
+                stage_id=stage_id,
+                progress=int(idx / len(files_to_update) * 100),
+            )
+        await self.update_progress_repository.finish_progress_stage(stage_id=stage_id)
 
         # Retrieve all existing embeddings from the database
         embeddings_by_file = defaultdict(list)
