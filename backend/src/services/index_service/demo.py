@@ -57,11 +57,11 @@ class DemoIndexService(BaseIndexService):
         return clusters
 
     async def get_last_updated_process(self) -> dict:
+        # TODO
         pass
-        # return {"last_updated": self.index.get("last_updated")}
 
     async def remove(self) -> None:
-        pass
+        await self.file_repository.remove()
 
     async def update(self, files: list[dict]) -> None:
         await self.remove()

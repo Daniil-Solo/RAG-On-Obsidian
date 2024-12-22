@@ -5,17 +5,21 @@ from abc import ABC, abstractmethod
 
 class FileRepository(ABC):
     @abstractmethod
-    async def add(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> dict:
+    async def add(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> dict:
+    async def update(self, name: str, size: int, updated_at: datetime, x: float, y: float) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, name: str) -> None:
+    async def remove(self) -> None:
         raise NotImplementedError
 
     @abstractmethod
     async def get_all(self) -> list[dict]:
-        raise NotImplementedError    
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_index_info(self) -> dict:
+        raise NotImplementedError

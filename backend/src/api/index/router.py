@@ -51,4 +51,6 @@ async def delete_index(
     index_service: Annotated[BaseRagService, Depends(get_index_service)],
     rag_service: Annotated[BaseRagService, Depends(get_rag_service)],
 ) -> MessageResponse:
-    pass
+    await index_service.remove()
+    await rag_service.remove()
+    return MessageResponse(message="Index deleted succesfully")

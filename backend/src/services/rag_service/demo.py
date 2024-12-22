@@ -212,3 +212,12 @@ class DemoQdrantRagService(BaseRagService):
                 })
 
         return results
+
+    async def remove(self) -> None:
+        await self.qdrant_client.recreate_collection(
+            QDRANT_COLLECTION_NAME,
+            VectorParams(
+                size=EMBEDDINGS_MODEL_SIZE,
+                distance=SIMILARITY_METRIC
+            ),
+        )

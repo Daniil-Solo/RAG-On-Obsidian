@@ -49,12 +49,13 @@ class FileSQLAlchemyRepository(FileRepository):
         info = result.scalars().first()
         return info and info.model_dump()
 
-    async def delete(self, name: str) -> None:
-        statement = select(FileModel).where(FileModel.name == name)
-        results = await self.session.execute(statement)
-        file_record = results.one()
+    async def remove(self) -> None:
+        statement = delete(FileModel)
+        await self.session.execute(statement)
+        await self.session.commit()
 
-        await self.session.delete(file_record)
+        statement = delete(IndexInfoModel)
+        await self.session.execute(statement)
         await self.session.commit()
 
     async def get_all(self) -> list[dict]:
