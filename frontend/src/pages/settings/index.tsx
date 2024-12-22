@@ -1,5 +1,5 @@
 import BasicLayout from "../../layouts/basic-layout"
-import {Tabs, Flex, Stack, TextInput, NumberInput, Select, Group, Button, useComputedColorScheme, useMantineColorScheme, MantineColorScheme, Box, LoadingOverlay } from '@mantine/core';
+import {Tabs, Flex, Stack, TextInput, NumberInput, Select, Group, Button, useComputedColorScheme, useMantineColorScheme, MantineColorScheme, Box } from '@mantine/core';
 import { useState, useEffect } from "react";
 import { VENDORS } from "./settings_config";
 import { LLMSettings } from "../../types/settings";
@@ -7,7 +7,7 @@ import { useCheckLLM, useLLMSettings, useUpdateLLMSettings } from "../../hooks/s
 
 
 const initialLLMSettings: LLMSettings = {
-    vendor: null,
+    vendor: "Mistral AI",
     model: null,
     token: "",
     baseUrl: "",
@@ -34,24 +34,12 @@ export const SettingsPage = () => {
                 <Tabs defaultValue="preferences" orientation="vertical" h={400} w={500} my="auto" variant="pills">
                     <Tabs.List>
                         <Tabs.Tab value="preferences">Preferences</Tabs.Tab>
-                        <Tabs.Tab value="llm">LLM</Tabs.Tab>
-                        <Tabs.Tab disabled value="retriever">Retriever</Tabs.Tab>
+                        <Tabs.Tab value="mistralai">Mistral AI</Tabs.Tab>
                     </Tabs.List>
 
-                    <Tabs.Panel value="llm">
+                    <Tabs.Panel value="mistralai">
                         <Stack ps={24}>
                             <Box pos="relative">
-                                <LoadingOverlay visible={isCheckPending} zIndex={1000} overlayProps={{ radius: "sm", blur: 0 }} loaderProps={{ color: 'violet', type: 'dots' }} />
-                                <Select 
-                                    variant="filled"
-                                    size="sm"
-                                    w="100%"
-                                    label="Type"
-                                    placeholder="Not selected"
-                                    data={VENDORS.map(vendor => vendor.name)}
-                                    value={llmSettings.vendor} 
-                                    onChange={value => setLLMSettings({...llmSettings, vendor: value, model: null})}
-                                />
                                 <Select
                                     variant="filled"
                                     size="sm"
@@ -66,7 +54,7 @@ export const SettingsPage = () => {
                                     variant="filled"
                                     size="sm"
                                     w="100%"
-                                    label={llmSettings.vendor === "GigaChat" ? "Auth Token": "API Token"}
+                                    label={"API Token"}
                                     placeholder="Input here"
                                     value={llmSettings.token}
                                     onChange={e => setLLMSettings({...llmSettings, token: e.target.value})}
@@ -85,7 +73,7 @@ export const SettingsPage = () => {
                                 />
                             </Box>
                             <Group>
-                                <Button size="sm" variant="outline" disabled={isCheckPending} onClick={() => checkLLM({
+                                <Button size="sm" variant="outline" loading={isCheckPending} loaderProps={{type: "dots"}} disabled={isCheckPending} onClick={() => checkLLM({
                                     vendor: llmSettings.vendor || "",
                                     token: llmSettings.token,
                                     model: llmSettings.model || "",
@@ -105,9 +93,6 @@ export const SettingsPage = () => {
                                 </Button>
                             </Group>
                         </Stack>
-                    </Tabs.Panel>
-                    <Tabs.Panel value="retriever">
-                        Comming soon...
                     </Tabs.Panel>
                     <Tabs.Panel value="preferences">
                         <Stack ps={24}>
