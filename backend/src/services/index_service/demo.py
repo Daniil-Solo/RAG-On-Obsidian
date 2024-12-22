@@ -1,8 +1,8 @@
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
-from src.services.index_service.base import BaseIndexService
 from src.repositories.index.interface import FileRepository
+from src.services.index_service.base import BaseIndexService
 
 
 class DemoIndexService(BaseIndexService):
@@ -10,7 +10,7 @@ class DemoIndexService(BaseIndexService):
         self,
         obsidian_path: str,
         file_repository: FileRepository,
-    ):
+    ) -> None:
         self.obsidian_path = Path(obsidian_path)
         self.file_repository = file_repository
 
@@ -38,7 +38,7 @@ class DemoIndexService(BaseIndexService):
     async def get_info(self) -> dict:
         files_to_update = await self.find_files_to_update()
         n_documents_to_update = len(files_to_update)
-        n_all_documents = len([path for path in self.obsidian_path.rglob("*.md")])
+        n_all_documents = len(list(path for path in self.obsidian_path.rglob("*.md")))
         index_info = await self.file_repository.get_index_info()
         last_update_time = None if index_info is None else index_info["last_update_time"]
         in_update_process = False  # TODO
@@ -49,12 +49,11 @@ class DemoIndexService(BaseIndexService):
             "last_update_time": last_update_time,
             "in_update_process": in_update_process,
         }
-    
+
     async def get_clusters(self) -> list[dict]:
         all_file_records = await self.file_repository.get_all()
 
-        clusters = [{k: file_record[k] for k in ("name", "x", "y")} for file_record in all_file_records]
-        return clusters
+        return [{k: file_record[k] for k in ("name", "x", "y")} for file_record in all_file_records]
 
     async def get_last_updated_process(self) -> dict:
         # TODO

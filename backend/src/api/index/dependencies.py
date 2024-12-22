@@ -1,16 +1,15 @@
+from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.config import app_config
 from src.database.session import get_async_session
 from src.repositories.index.interface import FileRepository
 from src.repositories.index.sqlalchemy import FileSQLAlchemyRepository
 from src.services.index_service.base import BaseIndexService
 from src.services.index_service.demo import DemoIndexService
-from src.config import app_config
-from fastapi import HTTPException
-from http import HTTPStatus
 
 
 def get_file_repository(

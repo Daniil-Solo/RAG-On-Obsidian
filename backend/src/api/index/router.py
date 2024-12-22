@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from src.api.general_schemas import MessageResponse
 from src.api.index.dependencies import get_index_service
+from src.api.index.schemas import ClustersResponse, IndexationProgressResponse, IndexInfoResponse
 from src.api.messages.dependencies import get_rag_service
-from src.api.index.schemas import IndexInfoResponse, ClustersResponse, IndexationProgressResponse
 from src.services.rag_service.base import BaseRagService
 
 index_router = APIRouter(prefix="/index", tags=["index"])
