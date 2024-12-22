@@ -26,6 +26,7 @@ const useUpdateLLMSettings = () => {
             onError: handleAPIError,
             onSuccess: (data: MessageResponse) => {
                 queryClient.invalidateQueries({ queryKey: ["settings_llm"] });
+                queryClient.invalidateQueries({ queryKey: ["llm_tokens"] });
                 notifySuccess(data.message);
             },
         }

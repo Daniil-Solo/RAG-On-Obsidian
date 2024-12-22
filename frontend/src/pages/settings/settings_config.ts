@@ -8,7 +8,7 @@ const VENDORS: Array<VendorInfo> = [
     {
         name: "GigaChat",
         models: [
-            "GigaChat-Lite", "GigaChat-Pro"
+            "GigaChat", "GigaChat-Pro", "GigaChat-Max"
         ]
     },
     {

@@ -11,6 +11,9 @@ class BaseLLMService(ABC):
     async def check(self) -> tuple[bool, str]:
         raise NotImplementedError("This method should be implemented")
 
+    @abstractmethod
+    async def get_used_tokens(self) -> tuple[int, int]:
+        raise NotImplementedError("This method should be implemented")
 
 class LLMException(Exception):
     def __init__(self, message: str):

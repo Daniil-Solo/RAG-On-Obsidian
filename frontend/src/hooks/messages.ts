@@ -23,6 +23,7 @@ const useSendChatMessage = () => {
             onError: handleAPIError,
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["chat_messages"] });
+                queryClient.invalidateQueries({ queryKey: ["llm_tokens"] });
             },
         }
     )
@@ -37,6 +38,7 @@ const useCleanChatMessage = () => {
             onError: handleAPIError,
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["chat_messages"] });
+                queryClient.invalidateQueries({ queryKey: ["llm_tokens"] });
             },
         }
     )

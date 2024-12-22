@@ -8,3 +8,6 @@ class DummyLLMService(BaseLLMService):
 
     async def check(self) -> tuple[bool, str]:
         return True, ""
+
+    async def get_used_tokens(self) -> tuple[int, int]:
+        return 100, 1200
