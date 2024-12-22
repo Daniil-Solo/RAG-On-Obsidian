@@ -121,4 +121,5 @@ class DemoQdrantRagService(BaseRagService):
             Answer:
         """
         answer = await self.llm.run(prompt)
-        return RagResponse(answer=answer, related_documents=list(related_documents))
+        used_tokens = await self.llm.get_used_tokens()
+        return RagResponse(answer=answer, related_documents=list(related_documents), used_tokens=used_tokens)
