@@ -6,7 +6,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from src.api.general_schemas import MessageResponse
 from src.api.index.dependencies import get_index_service, get_update_progress_repository
 from src.api.index.schemas import ClustersResponse, IndexInfoResponse, IndexProgressResponse
-from src.api.messages.dependencies import get_rag_service
+from src.api.general_dependencies import get_rag_service
 from src.repositories.index.interface import UpdateProgressRepository
 from src.services.index_service.base import BaseIndexService
 from src.services.rag_service.base import BaseRagService
