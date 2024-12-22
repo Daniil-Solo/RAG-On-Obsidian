@@ -9,6 +9,7 @@ class CustomTextSplitter:
             chunk_overlap=chunk_overlap,
             separator=r'[#]+ ',
             is_separator_regex=True,
+            keep_separator='start',
             )
         self.splitter_level2 = CharacterTextSplitter(
             chunk_size=chunk_size,

@@ -1,27 +1,21 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from src.api.messages.router import messages_router
 from src.api.settings.router import settings_router
 from src.api.index.router import index_router
+from src.api.llm_tokens.router import llm_tokens_router
 from src.config import app_config
 from src.utils.fastapi_docs import add_custom_docs_endpoints
 from src.utils.fastapi_cors import add_cors
 from src.utils.fastapi_spa import add_single_page_application_endpoints
-from src.services.rag_service.demo import DemoQdrantRagService
-
-
-@asynccontextmanager
-async def lifespan(application: FastAPI):
-    rag_service = DemoQdrantRagService(qdrant_url=app_config.QDRANT_URL)
-    await rag_service.create_vectordb(app_config.OBSIDIAN_PATH)
-    yield
+from src.utils.fastapi_lifespan import lifespan
 
 
 def add_routers(application: FastAPI, prefix: str = "") -> None:
     application.include_router(messages_router, prefix=prefix)
     application.include_router(settings_router, prefix=prefix)
     application.include_router(index_router, prefix=prefix)
+    application.include_router(llm_tokens_router, prefix=prefix)
 
 
 def create_application() -> FastAPI:

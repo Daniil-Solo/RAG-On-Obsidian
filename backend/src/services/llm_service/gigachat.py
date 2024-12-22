@@ -15,6 +15,8 @@ class GigaChatLLMService(BaseLLMService):
         self.model = model
         self.auth_token = auth_token
         self.max_tokens = max_tokens
+        self.input_tokens = 0
+        self.output_tokens = 0
 
     async def _run_with_params(self, query: str, max_tokens: int) -> str:
         ssl_context = ssl.create_default_context()
@@ -62,7 +64,10 @@ class GigaChatLLMService(BaseLLMService):
                 print(f"Model response content: {result}")
                 if resp.status != 200:
                     raise LLMException(message=json.loads(result)["message"])
-        return json.loads(result)["choices"][0]["message"]["content"]
+        result_dict = json.loads(result)
+        self.input_tokens += result_dict["usage"]["prompt_tokens"]
+        self.output_tokens += result_dict["usage"]["completion_tokens"]
+        return result_dict["choices"][0]["message"]["content"]
 
     async def run(self, query: str) -> str:
         return await self._run_with_params(query, self.max_tokens)
@@ -73,3 +78,6 @@ class GigaChatLLMService(BaseLLMService):
             return True, ""
         except LLMException as ex:
             return False, ex.message
+
+    async def get_used_tokens(self) -> tuple[int, int]:
+        return self.input_tokens, self.output_tokens

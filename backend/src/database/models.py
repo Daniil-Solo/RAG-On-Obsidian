@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlmodel import Field, SQLModel, create_engine
-
-from src.config import app_config
+from sqlmodel import Field, SQLModel
 
 
 class MessageModel(SQLModel, table=True):
@@ -56,7 +54,9 @@ class ProgressStageModel(SQLModel, table=True):
     finished_at: Optional[datetime] = Field(default=None)
 
 
-# Before all models
-metadata = SQLModel.metadata
-engine = create_engine(url=app_config.sync_db_url, echo=True)
-metadata.create_all(engine)
+class LLMTokensModel(SQLModel, table=True):
+    __tablename__ = "llm_tokens"
+
+    id: int = Field(default=None, primary_key=True)
+    input_tokens: int = Field(default=0, nullable=False)
+    output_tokens: int = Field(default=0, nullable=False)
