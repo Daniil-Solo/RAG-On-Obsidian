@@ -59,9 +59,9 @@ class GigaChatLLMService(BaseLLMService):
                 'Authorization': f'Bearer {access_token}'
             }
             async with client.post(CHECK_LINK, json=check_payload, headers=check_headers, ssl=ssl_context) as resp:
-                print(f"Model response status code: {resp.status}")
+                logger.info(f"Model response status code: {resp.status}")
                 result = await resp.content.read()
-                print(f"Model response content: {result}")
+                logger.info(f"Model response content: {result}")
                 if resp.status != 200:
                     raise LLMException(message=json.loads(result)["message"])
         result_dict = json.loads(result)
