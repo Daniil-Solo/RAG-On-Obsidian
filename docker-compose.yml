@@ -1,6 +1,6 @@
 services:
   web:
-    image: ragobs:latest
+    image: daniilsolo/ragobs:latest
     container_name: ragobs-web
     restart: always
     ports:
