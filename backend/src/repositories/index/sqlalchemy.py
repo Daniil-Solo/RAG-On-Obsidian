@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import delete, select, update
+from sqlmodel import delete, select, update, desc
 
 from src.database.models import FileModel, ProgressStageModel, UpdateProcessModel
 from src.repositories.index.interface import FileRepository, UpdateProgressRepository
@@ -39,6 +39,7 @@ class FileSQLAlchemyRepository(FileRepository):
                     x=x,
                     y=y,
                 )
+                .where(FileModel.name == name)
             )
             await self.session.execute(statement)
             await self.session.commit()
@@ -60,57 +61,45 @@ class UpdateProgressSQLAlchemyRepository(UpdateProgressRepository):
         self.session = session
 
     async def start_update_process(self) -> int:
-        process = await self.get_update_process()
-        if process is None:
-            new_process = UpdateProcessModel(started_at=datetime.utcnow(), is_actual=True)
-            self.session.add(new_process)
-            await self.session.commit()
-            process = await self.get_update_process()
-            return process["id"]
-        statement = (
-            update(UpdateProcessModel)
-            .where(UpdateProcessModel.id == process["id"])
-            .values(started_at=datetime.utcnow(), is_actual=True)
-        )
-        await self.session.execute(statement)
+        new_process = UpdateProcessModel(started_at=datetime.utcnow(), is_actual=True)
+        self.session.add(new_process)
         await self.session.commit()
-        return process["id"]
+        await self.session.refresh(new_process)
+        return new_process.id
 
     async def get_update_process(self) -> dict | None:
-        statement = select(UpdateProcessModel).limit(1)
+        statement = select(UpdateProcessModel).where(UpdateProcessModel.is_actual == True)
         result = await self.session.execute(statement)
+        process = result.scalars().first()
+        return process and process.model_dump()
 
+    async def get_last_update_process(self) -> dict | None:
+        statement = select(UpdateProcessModel).order_by(desc(UpdateProcessModel.finished_at)).limit(1)
+        result = await self.session.execute(statement)
         process = result.scalars().first()
         return process and process.model_dump()
 
     async def finish_update_process(self, process_id: int) -> None:
-        statement = update(UpdateProcessModel).where(UpdateProcessModel.id == process_id).values(finished_at=datetime.utcnow(), is_actual=False)
-        await self.session.execute(statement)
-        await self.session.commit()
-
-    async def start_progress_stage(self, name: str) -> int:
-        stage = await self.get_progress_stage()
-        if stage is None:
-            new_stage = ProgressStageModel(started_at=datetime.utcnow(), name=name, progress=0)
-            self.session.add(new_stage)
-            await self.session.commit()
-            stage = await self.get_progress_stage()
-            return stage["id"]
         statement = (
-            update(ProgressStageModel)
-            .where(ProgressStageModel.id == stage["id"])
-            .values(started_at=datetime.utcnow(), name=name, progress=0)
+            update(UpdateProcessModel)
+            .where(UpdateProcessModel.id == process_id)
+            .values(finished_at=datetime.utcnow(), is_actual=False)
         )
         await self.session.execute(statement)
         await self.session.commit()
-        return stage["id"]
 
-    async def get_progress_stage(self) -> dict | None:
-        statement = select(ProgressStageModel).limit(1)
+    async def start_progress_stage(self, name: str, process_id: int) -> int:
+        new_stage = ProgressStageModel(started_at=datetime.utcnow(), name=name, progress=0, process_id=process_id)
+        self.session.add(new_stage)
+        await self.session.commit()
+        await self.session.refresh(new_stage)
+        return new_stage.id
+
+    async def get_stages_by_process(self, process_id: int) -> list[dict]:
+        statement = select(ProgressStageModel).where(ProgressStageModel.process_id == process_id)
         result = await self.session.execute(statement)
-
-        stage = result.scalars().first()
-        return stage and stage.model_dump()
+        stages = result.scalars().all()
+        return [stage.model_dump() for stage in stages]
 
     async def update_progress_stage(self, stage_id: int, progress: int) -> None:
         statement = select(ProgressStageModel).where(ProgressStageModel.id == stage_id)

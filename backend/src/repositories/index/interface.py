@@ -31,15 +31,19 @@ class UpdateProgressRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_last_update_process(self) -> dict | None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def finish_update_process(self, process_id: int) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def start_progress_stage(self, name: str) -> int:
+    async def start_progress_stage(self, name: str, process_id: int) -> int:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_progress_stage(self) -> dict | None:
+    async def get_stages_by_process(self, process_id: int) -> list[dict]:
         raise NotImplementedError
 
     @abstractmethod

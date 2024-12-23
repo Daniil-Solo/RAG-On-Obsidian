@@ -21,28 +21,28 @@ class DemoIndexService(BaseIndexService):
         file_to_update_time = {file_record["name"]: file_record["updated_at"] for file_record in all_file_records}
 
         # updated files
-        current_files = []
-        files_to_update = []
+        current_files_set = set()
+        files_to_update_set = set()
         for path in self.obsidian_path.rglob("*.md"):
             str_path = path.as_posix()
             if str_path in file_to_update_time and datetime.utcfromtimestamp(path.stat().st_mtime) != file_to_update_time[str_path]:
-                files_to_update.append(str_path)
-            current_files.append(str_path)
+                files_to_update_set.add(str_path)
+            current_files_set.add(str_path)
 
         # created and deleted files
-        indexed_files = set(file_to_update_time.keys())
-        created_and_deleted_files = list(indexed_files ^ set(current_files))
+        indexed_files_set = set(file_to_update_time.keys())
+        created_and_deleted_files = list(indexed_files_set ^ current_files_set)
+        for file in created_and_deleted_files:
+            files_to_update_set.add(file)
 
-        files_to_update.extend(created_and_deleted_files)
-
-        return files_to_update
+        return list(files_to_update_set)
 
     async def get_info(self) -> dict:
         files_to_update = await self.find_files_to_update()
         n_documents_to_update = len(files_to_update)
         n_all_documents = len(list(self.obsidian_path.rglob("*.md")))
 
-        last_update_process = await self.update_progress_repository.get_update_process()
+        last_update_process = await self.update_progress_repository.get_last_update_process()
         last_update_time = None if last_update_process is None else last_update_process["finished_at"]
         in_update_process = False if last_update_process is None else last_update_process["is_actual"]
 
@@ -55,16 +55,17 @@ class DemoIndexService(BaseIndexService):
 
     async def get_clusters(self) -> list[dict]:
         all_file_records = await self.file_repository.get_all()
-
         return [{k: file_record[k] for k in ("name", "x", "y")} for file_record in all_file_records]
 
     async def remove(self) -> None:
         await self.file_repository.remove()
 
     async def update(self, files: list[dict]) -> None:
-        await self.remove()
-
-        stage_id = await self.update_progress_repository.start_progress_stage(name="update_index")
+        # await self.remove()
+        process = await self.update_progress_repository.get_update_process()
+        stage_id = await self.update_progress_repository.start_progress_stage(
+            name="2. Updating index", process_id=process["id"]
+        )
         for idx, file in enumerate(files):
             await self.file_repository.update(
                 name=file["file_path"],
