@@ -1,5 +1,5 @@
 from enum import Enum
-
+from typing import Optional
 from pydantic import DirectoryPath, Field, FilePath
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -13,8 +13,14 @@ class ApplicationMode(Enum):
 class ApplicationConfig(BaseSettings):
     OBSIDIAN_PATH: str = DirectoryPath()
     MODE: ApplicationMode = Field(default=ApplicationMode.DEBUG)
-    DB_PATH: str = Field(default="./rag_on_obsidian.db")
+    DB_HOST: str = Field()
+    DB_PORT: int = Field()
+    DB_USER: str = Field()
+    DB_PASSWORD: str = Field()
+    DB_NAME: str = Field()
     ORIGINS: str = Field(default="")
+    STATIC_PATH: Optional[str] = Field(default=None)
+    QDRANT_URL: Optional[str] = Field(default=None)
 
     @property
     def is_debug(self) -> bool:
@@ -22,11 +28,11 @@ class ApplicationConfig(BaseSettings):
 
     @property
     def sync_db_url(self) -> str:
-        return f"sqlite:///{self.DB_PATH}"
+        return f"postgresql+psycopg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     @property
     def async_db_url(self) -> str:
-        return f"sqlite+aiosqlite:///{self.DB_PATH}"
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     @property
     def origins(self) -> list[str]:

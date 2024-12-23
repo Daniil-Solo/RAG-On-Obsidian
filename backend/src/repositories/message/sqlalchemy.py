@@ -17,7 +17,7 @@ class MessageSQLAlchemyRepository(MessageRepository):
         return message.model_dump()
 
     async def get_many(self, limit: int, offset: int) -> list[dict]:
-        statement = select(MessageModel).order_by(MessageModel.created_date).offset(offset).limit(limit)
+        statement = select(MessageModel).order_by(MessageModel.created_date)
         result = await self.session.execute(statement)
         return [res.model_dump() for res in result.scalars().all()]
 

@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
-from sqlmodel import Field, SQLModel, create_engine
-
-from src.config import app_config
+from pgvector.sqlalchemy import Vector
+from sqlmodel import Field, SQLModel
+from sqlalchemy import Column
 
 
 class MessageModel(SQLModel, table=True):
@@ -26,7 +26,49 @@ class LLMSettingsModel(SQLModel, table=True):
     max_tokens: int = Field(..., nullable=False)
 
 
-# Before all models
-metadata = SQLModel.metadata
-engine = create_engine(url=app_config.sync_db_url, echo=True)
-metadata.create_all(engine)
+class FileModel(SQLModel, table=True):
+    __tablename__ = "files"
+
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(..., nullable=False)
+    size: int = Field(..., nullable=False)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    x: float = Field(..., nullable=False)
+    y: float = Field(..., nullable=False)
+
+
+class UpdateProcessModel(SQLModel, table=True):
+    __tablename__ = "update_process"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    finished_at: Optional[datetime] = Field(default=None)
+    is_actual: bool = Field(default=True)
+
+
+class ProgressStageModel(SQLModel, table=True):
+    __tablename__ = "progress_stage"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(..., nullable=False)
+    process_id: int = Field(..., nullable=False)
+    progress: int = Field(..., nullable=False)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    finished_at: Optional[datetime] = Field(default=None)
+
+
+class LLMTokensModel(SQLModel, table=True):
+    __tablename__ = "llm_tokens"
+
+    id: int = Field(default=None, primary_key=True)
+    input_tokens: int = Field(default=0, nullable=False)
+    output_tokens: int = Field(default=0, nullable=False)
+
+
+class ChunkEmbeddingModel(SQLModel, table=True):
+    __tablename__ = "chunk_embeddings"
+
+    id: int = Field(default=None, primary_key=True)
+    filename: str = Field(..., nullable=False)
+    text: str = Field(..., nullable=False)
+    embedding: Any = Field(sa_column=Column(Vector(1024)))
