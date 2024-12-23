@@ -1,10 +1,9 @@
-# Rag-On-Obsidian
-
-A web application for using RAG based on Obsidian Notes
-![image](https://github.com/user-attachments/assets/83606546-a0a7-454e-88c2-19c9cf726acc)
-![image](https://github.com/user-attachments/assets/09cea54f-99bc-4b7b-87a1-f2a657d2f042)
+# RAG-On-Obsidian
+> Получи ответы на вопросы по своей базе знаний в Obsidian
 
 
+## Исследования
+Подробнее про сплиттинг текста, выбор эмбединговой модели и оценивание качества ретрива можно почитать [здесь](https://github.com/Daniil-Solo/RAG-On-Obsidian/blob/main/experiments/README.md)
 
 ## Запуск приложения
 
