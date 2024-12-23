@@ -6,12 +6,6 @@ from abc import ABC, abstractmethod
 class RagResponse:
     answer: str
     related_documents: list[str]
-
-
-@dataclass
-class RagResponse:
-    answer: str
-    related_documents: list[str]
     used_tokens: tuple[int, int]
 
 

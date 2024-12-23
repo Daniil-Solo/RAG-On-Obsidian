@@ -35,8 +35,8 @@ class MistralAIEmbeddingsService(BaseEmbeddingsService):
             async with client.post(EMBED_LINK, json=payload, headers=headers) as resp:
                 logger.info(f"Embedding response status code: {resp.status}")
                 result = await resp.content.read()
-                logger.info(f"Embedding response content: {result}")
                 if resp.status != 200:
+                    logger.warning(f"Embedding response content: {result}")
                     raise EmbeddingsException(result.decode("utf-8"))
         result_dict = json.loads(result)
         self.input_tokens += result_dict["usage"]["prompt_tokens"]
@@ -48,6 +48,8 @@ class MistralAIEmbeddingsService(BaseEmbeddingsService):
         return embeds[0]
 
     async def embed_many(self, queries: list[str]) -> list[list[float]]:
+        if len(queries) == 1:
+            return [await self.embed_one(queries[0])]
         embeds = []
         for i in range(0, len(queries), self.batch_size):
             batch_queries = queries[i:i+self.batch_size]

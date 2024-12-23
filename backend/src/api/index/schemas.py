@@ -1,6 +1,6 @@
 from datetime import datetime
-
-from pydantic import BaseModel, Field
+from pathlib import Path
+from pydantic import BaseModel
 
 
 class IndexInfoResponse(BaseModel):
@@ -22,10 +22,18 @@ class ClustersResponse(BaseModel):
     @staticmethod
     def from_list(clusters: list[dict]) -> "ClustersResponse":
         return ClustersResponse(
-            clusters=[ClusterSchema(**cluster) for cluster in clusters],
+            clusters=[
+                ClusterSchema(name=Path(cluster["name"]).stem, x=cluster["x"], y=cluster["y"])
+                for cluster in clusters
+            ],
         )
 
 
-class IndexProgressResponse(BaseModel):
+class StageProgressSchema(BaseModel):
     name: str
     value: int
+
+
+class UpdateIndexProgressResponse(BaseModel):
+    in_progress: bool
+    stages: list[StageProgressSchema]

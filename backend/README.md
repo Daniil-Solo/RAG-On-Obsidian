@@ -35,9 +35,8 @@ docker build -f Dockerfile -t ragobs-api:latest .
 docker run --rm -it -p 5000:5000 -v ./obsidian:/app/obsidian -e OBSIDIAN_PATH='/app/obsidian' -e ORIGINS='http://localhost:5173' --name ragobs-api -d ragobs-api:latest
 ```
 
-### Qdrant Docker
+### Запуск Postgres с PgVector в Docker
 
 ```bash
-docker pull qdrant/qdrant
-docker run -p 6333:6333 -p 6334:6334 -v ./qdrant_storage:/qdrant/storage:z qdrant/qdrant
+docker compose -f pgvector.docker-compose.yml up -d
 ```

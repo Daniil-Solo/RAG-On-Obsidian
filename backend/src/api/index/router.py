@@ -1,15 +1,18 @@
-from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends
 
 from src.api.general_schemas import MessageResponse
 from src.api.index.dependencies import get_index_service, get_update_progress_repository
-from src.api.index.schemas import ClustersResponse, IndexInfoResponse, IndexProgressResponse
-from src.api.general_dependencies import get_rag_service
+from src.api.index.schemas import ClustersResponse, IndexInfoResponse, StageProgressSchema, UpdateIndexProgressResponse
 from src.repositories.index.interface import UpdateProgressRepository
 from src.services.index_service.base import BaseIndexService
-from src.services.rag_service.base import BaseRagService
+from src.services.vector_store_service.base import BaseVectorStoreService
+from src.api.general_dependencies import get_vector_store_service
+from src.api.index.dependencies import get_file_repository
+from src.repositories.index.interface import FileRepository
+from src.utils.update_vector_store import update_vector_store
+from src.utils.decomposition import get_decomposition_components
 
 index_router = APIRouter(prefix="/index", tags=["index"])
 
@@ -40,35 +43,48 @@ async def get_clusters(
 async def update_index(
     background_tasks: BackgroundTasks,
     index_service: Annotated[BaseIndexService, Depends(get_index_service)],
-    rag_service: Annotated[BaseRagService, Depends(get_rag_service)],
+    vector_store_service: Annotated[BaseVectorStoreService, Depends(get_vector_store_service)],
     update_progress_repository: Annotated[UpdateProgressRepository, Depends(get_update_progress_repository)],
+    file_repository: Annotated[FileRepository, Depends(get_file_repository)],
 ) -> MessageResponse:
-    async def background_indexing() -> None:
-        process_id = await update_progress_repository.start_update_process()
-        files_to_update = await index_service.find_files_to_update()
-        files_with_coords = await rag_service.update(files_to_update)
-        await index_service.update(files_with_coords)
-        await update_progress_repository.finish_update_process(process_id=process_id)
+    current_process = await update_progress_repository.get_update_process()
+    if current_process:
+        return MessageResponse(message="The index update operation has already started")
 
-    background_tasks.add_task(background_indexing)
-    return MessageResponse(message="Index update started in the background")
+    # async def update_index_in_background() -> None:
+    process_id = await update_progress_repository.start_update_process()
+    files_to_update = await index_service.find_files_to_update()
+    await update_vector_store(files_to_update, update_progress_repository, vector_store_service)
+    results = await get_decomposition_components(files_to_update, file_repository, vector_store_service)
+    await index_service.update(results)
+    await update_progress_repository.finish_update_process(process_id=process_id)
+
+    # background_tasks.add_task(update_index_in_background)
+    return MessageResponse(message="Index has been updated")
 
 
-@index_router.put("/progress", response_model=IndexProgressResponse)
+@index_router.get("/progress", response_model=UpdateIndexProgressResponse)
 async def get_index_progress(
     update_progress_repository: Annotated[UpdateProgressRepository, Depends(get_update_progress_repository)],
-) -> IndexProgressResponse:
-    stage = await update_progress_repository.get_progress_stage()
-    if stage is not None:
-        return IndexProgressResponse(name=stage["name"], value=stage["progress"])
-    return IndexProgressResponse(name="No active process", value=0)
+) -> UpdateIndexProgressResponse:
+    process = await update_progress_repository.get_update_process()
+    if not process:
+        return UpdateIndexProgressResponse(in_progress=False, stages=[])
+    stages = await update_progress_repository.get_stages_by_process(process["id"])
+    return UpdateIndexProgressResponse(
+        in_progress=True,
+        stages=[
+            StageProgressSchema(name=stage["name"], value=stage["progress"])
+            for stage in stages
+        ]
+    )
 
 
 @index_router.delete("/", response_model=MessageResponse)
 async def delete_index(
-    index_service: Annotated[BaseRagService, Depends(get_index_service)],
-    rag_service: Annotated[BaseRagService, Depends(get_rag_service)],
+    index_service: Annotated[BaseIndexService, Depends(get_index_service)],
+    vector_store_service: Annotated[BaseVectorStoreService, Depends(get_vector_store_service)],
 ) -> MessageResponse:
+    await vector_store_service.remove_all_chunks()
     await index_service.remove()
-    await rag_service.remove()
-    return MessageResponse(message="Index deleted succesfully")
+    return MessageResponse(message="Index deleted successfully")

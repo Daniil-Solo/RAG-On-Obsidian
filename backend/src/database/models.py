@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
+from pgvector.sqlalchemy import Vector
 from sqlmodel import Field, SQLModel
+from sqlalchemy import Column
 
 
 class MessageModel(SQLModel, table=True):
@@ -49,6 +51,7 @@ class ProgressStageModel(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(..., nullable=False)
+    process_id: int = Field(..., nullable=False)
     progress: int = Field(..., nullable=False)
     started_at: datetime = Field(default_factory=datetime.utcnow)
     finished_at: Optional[datetime] = Field(default=None)
@@ -60,3 +63,12 @@ class LLMTokensModel(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     input_tokens: int = Field(default=0, nullable=False)
     output_tokens: int = Field(default=0, nullable=False)
+
+
+class ChunkEmbeddingModel(SQLModel, table=True):
+    __tablename__ = "chunk_embeddings"
+
+    id: int = Field(default=None, primary_key=True)
+    filename: str = Field(..., nullable=False)
+    text: str = Field(..., nullable=False)
+    embedding: Any = Field(sa_column=Column(Vector(1024)))
