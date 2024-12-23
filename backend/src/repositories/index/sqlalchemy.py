@@ -44,6 +44,11 @@ class FileSQLAlchemyRepository(FileRepository):
             await self.session.execute(statement)
             await self.session.commit()
 
+    async def remove_one(self, name: str) -> None:
+        statement = delete(FileModel).where(FileModel.name == name)
+        await self.session.execute(statement)
+        await self.session.commit()
+
     async def remove(self) -> None:
         statement = delete(FileModel)
         await self.session.execute(statement)
@@ -74,7 +79,12 @@ class UpdateProgressSQLAlchemyRepository(UpdateProgressRepository):
         return process and process.model_dump()
 
     async def get_last_update_process(self) -> dict | None:
-        statement = select(UpdateProcessModel).order_by(desc(UpdateProcessModel.finished_at)).limit(1)
+        statement = (
+            select(UpdateProcessModel)
+            .where(UpdateProcessModel.is_actual == False)
+            .order_by(desc(UpdateProcessModel.finished_at))
+            .limit(1)
+        )
         result = await self.session.execute(statement)
         process = result.scalars().first()
         return process and process.model_dump()

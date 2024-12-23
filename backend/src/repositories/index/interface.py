@@ -13,6 +13,10 @@ class FileRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def remove_one(self, name: str) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def remove(self) -> None:
         raise NotImplementedError
 

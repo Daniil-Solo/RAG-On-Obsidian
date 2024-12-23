@@ -12,7 +12,7 @@ from src.api.general_dependencies import get_vector_store_service
 from src.api.index.dependencies import get_file_repository
 from src.repositories.index.interface import FileRepository
 from src.utils.update_vector_store import update_vector_store
-from src.utils.pca import get_pca
+from src.utils.decomposition import get_decomposition_components
 
 index_router = APIRouter(prefix="/index", tags=["index"])
 
@@ -47,16 +47,20 @@ async def update_index(
     update_progress_repository: Annotated[UpdateProgressRepository, Depends(get_update_progress_repository)],
     file_repository: Annotated[FileRepository, Depends(get_file_repository)],
 ) -> MessageResponse:
-    async def update_index_in_background() -> None:
-        process_id = await update_progress_repository.start_update_process()
-        files_to_update = await index_service.find_files_to_update()
-        await update_vector_store(files_to_update, update_progress_repository, vector_store_service)
-        results = await get_pca(files_to_update, file_repository, vector_store_service)
-        await index_service.update(results)
-        await update_progress_repository.finish_update_process(process_id=process_id)
+    current_process = await update_progress_repository.get_update_process()
+    if current_process:
+        return MessageResponse(message="The index update operation has already started")
 
-    background_tasks.add_task(update_index_in_background)
-    return MessageResponse(message="Index update started in the background")
+    # async def update_index_in_background() -> None:
+    process_id = await update_progress_repository.start_update_process()
+    files_to_update = await index_service.find_files_to_update()
+    await update_vector_store(files_to_update, update_progress_repository, vector_store_service)
+    results = await get_decomposition_components(files_to_update, file_repository, vector_store_service)
+    await index_service.update(results)
+    await update_progress_repository.finish_update_process(process_id=process_id)
+
+    # background_tasks.add_task(update_index_in_background)
+    return MessageResponse(message="Index has been updated")
 
 
 @index_router.get("/progress", response_model=UpdateIndexProgressResponse)

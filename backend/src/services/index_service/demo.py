@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -67,15 +68,18 @@ class DemoIndexService(BaseIndexService):
             name="2. Updating index", process_id=process["id"]
         )
         for idx, file in enumerate(files):
+            await self.update_progress_repository.update_progress_stage(
+                stage_id=stage_id,
+                progress=int(idx / len(files) * 100),
+            )
+            if file["is_removed"]:
+                await self.file_repository.remove_one(file["file_path"])
+                continue
             await self.file_repository.update(
                 name=file["file_path"],
                 x=file["x"],
                 y=file["y"],
                 size=Path(file["file_path"]).stat().st_size,
                 updated_at=datetime.utcfromtimestamp(Path(file["file_path"]).stat().st_mtime),
-            )
-            await self.update_progress_repository.update_progress_stage(
-                stage_id=stage_id,
-                progress=int(idx / len(files) * 100),
             )
         await self.update_progress_repository.finish_progress_stage(stage_id=stage_id)
