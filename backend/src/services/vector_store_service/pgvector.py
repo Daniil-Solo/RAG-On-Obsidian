@@ -15,13 +15,13 @@ class PGVectorStoreService(BaseVectorStoreService):
     async def retrieve(self, query: str, k: int) -> list[dict]:
         embed = await self.embedding_service.embed_one(query)
         statement = (
-            select(ChunkEmbeddingModel.filename, ChunkEmbeddingModel.text)
+            select(ChunkEmbeddingModel)
             .order_by(ChunkEmbeddingModel.embedding.cosine_distance(embed))
             .limit(k)
         )
         results = await self.session.execute(statement)
-        files = results.scalars().all()
-        return [file.model_dump() for file in files]
+        chunks = results.scalars().all()
+        return [chunk.model_dump() for chunk in chunks]
 
     async def add_chunks(self, texts: list[str], filenames: list[str]) -> None:
         try:

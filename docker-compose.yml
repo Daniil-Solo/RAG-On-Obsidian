@@ -1,26 +1,35 @@
 services:
   web:
     image: ragobs:latest
-    restart: always
     container_name: ragobs-web
+    restart: always
     ports:
       - 80:5000
     expose:
       - 5000
     environment:
       - OBSIDIAN_PATH=/obsidian
-      - QDRANT_URL=http://qdrant:6333
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=ragobs
     volumes:
       - ./backend/obsidian:/obsidian
 
-  qdrant:
-    image: qdrant/qdrant:latest
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: pgvector-db
     restart: always
-    container_name: qdrant
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ragobs
     ports:
-      - 6333:6333
-#    volumes:
-#      - qdrant-data:/qdrant/storage
+      - "5432:5432"
+    volumes:
+      - ragobs_pgdata:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/schema.sql
 
-#volumes:
-#  qdrant-data:
+volumes:
+  ragobs_pgdata:

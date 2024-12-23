@@ -1,5 +1,6 @@
 import logging
-from src.services.llm_service.base import BaseLLMService
+import asyncio
+from src.services.llm_service.base import BaseLLMService, LLMException
 from src.services.vector_store_service.base import BaseVectorStoreService
 from src.services.rag_service.base import BaseRagService, RagResponse
 
@@ -28,6 +29,11 @@ class FinalRagService(BaseRagService):
         logger.info(f"Retrieved fragments: {fragments}")
         retrieved_context = "\n\n".join([fragment['text'] for fragment in fragments])
         prompt = PROMPT % (retrieved_context, user_query)
-        answer = await self.llm.run(prompt)
+        try:
+            answer = await self.llm.run(prompt)
+        except LLMException as ex:
+            logger.warning(f"Error: {str(ex)}")
+            await asyncio.sleep(2)
+            answer = await self.llm.run(prompt)
         used_tokens = await self.llm.get_used_tokens()
         return RagResponse(answer=answer, related_documents=list(related_documents), used_tokens=used_tokens)
