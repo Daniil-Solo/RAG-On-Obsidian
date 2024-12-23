@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
    
 env:
-  REPO_NAME: daniilsolo/ragobs
+  REPO_NAME: ragobs
 
 jobs:
   build-and-push:
