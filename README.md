@@ -84,9 +84,12 @@ RAG-On-Obsidian — это инструмент, который позволяе
 
 Здесь, пользователь может выбрать, какую тему использовать в приложении и какую модель для генерации ответов.
 
-<div style="display: flex; justify-content: space-between; align-items: center;">
-  <img src="assets/settings-dark.png" alt="Left Image" style="width: 49%; height: 250px;">
-  <img src="assets/settings.png" alt="Right Image" style="width: 49%; height: 250px;">
+<div align="center">
+  <img src="assets/settings-dark.png">
+</div>
+
+<div align="center">
+  <img src="assets/settings.png">
 </div>
 
 ## Исследования
