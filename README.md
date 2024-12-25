@@ -93,7 +93,7 @@ RAG-On-Obsidian — это инструмент, который позволяе
 - На основе пользовательского запроса и чанков с помощью LLM (GigaChat или Mistral) генерируем итоговый ответ
 
 <div align="center">
-  <img src="assets/chat-pipeline.png">
+  <img src="assets/chat-pipeline.svg">
 </div>
 
 ### Индексация базы данных
@@ -105,7 +105,7 @@ RAG-On-Obsidian — это инструмент, который позволяе
 - По полученному результату обновляем наш индекс
 
 <div align="center">
-  <img src="assets/indexation-pipeline.png">
+  <img src="assets/indexation-pipeline.svg">
 </div>
 
 ## Исследования
