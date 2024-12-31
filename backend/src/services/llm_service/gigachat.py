@@ -1,11 +1,14 @@
 import json
-import aiohttp
 import logging
 import ssl
-from src.services.llm_service.base import BaseLLMService, LLMException
+
+import aiohttp
+
+from src.services.llm_service.base import BaseLLMService, LLMError
 
 AUTH_LINK = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
 CHECK_LINK = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
+SUCCESS_HTTP_STATUS = 200
 
 logger = logging.getLogger(__name__)
 
@@ -25,20 +28,18 @@ class GigaChatLLMService(BaseLLMService):
 
         async with aiohttp.ClientSession() as client:
             auth_payload = {
-                'scope': 'GIGACHAT_API_PERS'
+                "scope": "GIGACHAT_API_PERS"
             }
             auth_headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json',
-                'RqUID': '71d31622-ba00-4dfc-a4f9-46cb9b4c5c6b',
-                'Authorization': f'Basic {self.auth_token}'
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json",
+                "RqUID": "71d31622-ba00-4dfc-a4f9-46cb9b4c5c6b",
+                "Authorization": f"Basic {self.auth_token}"
             }
             async with client.post(AUTH_LINK, data=auth_payload, headers=auth_headers, ssl=ssl_context) as resp:
-                print(f"Auth response status code: {resp.status}")
                 result = await resp.content.read()
-                print(f"Auth response content: {result}")
-                if resp.status != 200:
-                    raise LLMException(message=json.loads(result)["message"])
+                if resp.status != SUCCESS_HTTP_STATUS:
+                    raise LLMError(message=json.loads(result)["message"])
                 access_token = json.loads(result).get("access_token")
 
             check_payload = {
@@ -54,16 +55,16 @@ class GigaChatLLMService(BaseLLMService):
                 "max_tokens": max_tokens
             }
             check_headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': f'Bearer {access_token}'
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": f"Bearer {access_token}"
             }
             async with client.post(CHECK_LINK, json=check_payload, headers=check_headers, ssl=ssl_context) as resp:
                 logger.info(f"Model response status code: {resp.status}")
                 result = await resp.content.read()
                 logger.info(f"Model response content: {result}")
-                if resp.status != 200:
-                    raise LLMException(message=json.loads(result)["message"])
+                if resp.status != SUCCESS_HTTP_STATUS:
+                    raise LLMError(message=json.loads(result)["message"])
         result_dict = json.loads(result)
         self.input_tokens += result_dict["usage"]["prompt_tokens"]
         self.output_tokens += result_dict["usage"]["completion_tokens"]
@@ -75,9 +76,10 @@ class GigaChatLLMService(BaseLLMService):
     async def check(self) -> tuple[bool, str]:
         try:
             await self._run_with_params("Ты", 1)
-            return True, ""
-        except LLMException as ex:
+        except LLMError as ex:
             return False, ex.message
+        else:
+            return True, ""
 
     async def get_used_tokens(self) -> tuple[int, int]:
         return self.input_tokens, self.output_tokens

@@ -1,13 +1,13 @@
 import logging
-from src.services.llm_service.base import BaseLLMService
 
+from src.services.llm_service.base import BaseLLMService
 
 logger = logging.getLogger(__name__)
 
 
 class LLMServiceBuilder:
     @staticmethod
-    def build(vendor: str, model: str, token: str, base_url: str, max_tokens: int, **kwargs) -> BaseLLMService:
+    def build(vendor: str, model: str, token: str, base_url: str, max_tokens: int) -> BaseLLMService:  # noqa: ARG004
         match vendor:
             case "GigaChat":
                 from src.services.llm_service.gigachat import GigaChatLLMService
@@ -22,4 +22,5 @@ class LLMServiceBuilder:
                 logger.info("Using Dummy LLM Service")
                 return DummyLLMService()
             case _:
-                raise NotImplementedError(f"Type {vendor} is unknown")
+                error_text = f"Type {vendor} is unknown"
+                raise NotImplementedError(error_text)

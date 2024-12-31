@@ -1,5 +1,5 @@
-from typing import Literal
 from abc import ABC, abstractmethod
+from typing import Literal
 
 
 class MessageRepository(ABC):
@@ -8,7 +8,7 @@ class MessageRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_many(self, limit: int, offset: int) -> list[dict]:
+    async def get_many(self) -> list[dict]:
         raise NotImplementedError
 
     @abstractmethod

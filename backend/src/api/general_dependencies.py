@@ -1,25 +1,24 @@
+from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import Depends
-from fastapi import HTTPException
-from http import HTTPStatus
+from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.settings.dependencies import get_settings_repository
+from src.config import app_config
+from src.database.session import get_async_session
 from src.repositories.llm_tokens.interface import LLMTokensRepository
 from src.repositories.llm_tokens.sqlalchemy import LLMTokensSQLAlchemyRepository
-from src.database.session import get_async_session
-from src.services.rag_service.base import BaseRagService
-from src.services.rag_service.final import FinalRagService
-from src.services.rag_service.dummy import DummyRagService
-from src.services.llm_service.base import BaseLLMService
-from src.services.llm_service.builder import LLMServiceBuilder
-from src.api.settings.dependencies import get_settings_repository
 from src.repositories.settings.interface import SettingsRepository
-from src.services.vector_store_service.base import BaseVectorStoreService
-from src.services.vector_store_service.pgvector import PGVectorStoreService
 from src.services.embeddings_service.base import BaseEmbeddingsService
 from src.services.embeddings_service.mistralai import MistralAIEmbeddingsService
-from src.config import app_config
+from src.services.llm_service.base import BaseLLMService
+from src.services.llm_service.builder import LLMServiceBuilder
+from src.services.rag_service.base import BaseRagService
+from src.services.rag_service.dummy import DummyRagService
+from src.services.rag_service.final import FinalRagService
+from src.services.vector_store_service.base import BaseVectorStoreService
+from src.services.vector_store_service.pgvector import PGVectorStoreService
 
 
 def get_llm_tokens_repository(

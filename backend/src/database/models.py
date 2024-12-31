@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any, Optional
 
 from pgvector.sqlalchemy import Vector
-from sqlmodel import Field, SQLModel
 from sqlalchemy import Column
+from sqlmodel import Field, SQLModel
 
 
 class MessageModel(SQLModel, table=True):

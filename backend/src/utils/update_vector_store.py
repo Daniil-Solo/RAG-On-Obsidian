@@ -1,10 +1,11 @@
-import os
-import aiofiles
 import logging
+import os
+
+import aiofiles
+
 from src.repositories.index.interface import UpdateProgressRepository
 from src.services.vector_store_service.base import BaseVectorStoreService
 from src.utils.text_splitter import CustomTextSplitter
-
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ async def update_vector_store(
         if os.path.exists(file_path):
             # Remove old data and add updated data
             await vector_store.remove_chunks_of_file(filename)
-            async with aiofiles.open(file_path, 'r', encoding="utf-8") as f:
+            async with aiofiles.open(file_path, encoding="utf-8") as f:
                 content = await f.read()
             text_chunks = text_splitter.split(filename[:-3] + " " + content)
             await vector_store.add_chunks(text_chunks, [filename] * len(text_chunks))

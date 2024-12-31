@@ -1,16 +1,16 @@
 import logging
+
 from fastapi import FastAPI
 
-from src.api.messages.router import messages_router
-from src.api.settings.router import settings_router
 from src.api.index.router import index_router
 from src.api.llm_tokens.router import llm_tokens_router
+from src.api.messages.router import messages_router
+from src.api.settings.router import settings_router
 from src.config import app_config
-from src.utils.fastapi_docs import add_custom_docs_endpoints
 from src.utils.fastapi_cors import add_cors
-from src.utils.fastapi_spa import add_single_page_application_endpoints
+from src.utils.fastapi_docs import add_custom_docs_endpoints
 from src.utils.fastapi_lifespan import lifespan
-
+from src.utils.fastapi_spa import add_single_page_application_endpoints
 
 logging.basicConfig(level=logging.DEBUG if app_config.is_debug else logging.INFO)
 
