@@ -1,7 +1,7 @@
 name: Ruff Linter
 
 on:
-  pull:
+  pull_request:
     branches:
       - main
     paths:
