@@ -26,7 +26,11 @@ class DemoIndexService(BaseIndexService):
         files_to_update_set = set()
         for path in self.obsidian_path.rglob("*.md"):
             str_path = path.as_posix()
-            if str_path in file_to_update_time and datetime.utcfromtimestamp(path.stat().st_mtime) != file_to_update_time[str_path]:
+            existing_file_has_been_updated = (
+                str_path in file_to_update_time and
+                datetime.utcfromtimestamp(path.stat().st_mtime) != file_to_update_time[str_path]
+            )
+            if existing_file_has_been_updated:
                 files_to_update_set.add(str_path)
             current_files_set.add(str_path)
 
@@ -62,7 +66,6 @@ class DemoIndexService(BaseIndexService):
         await self.file_repository.remove()
 
     async def update(self, files: list[dict]) -> None:
-        # await self.remove()
         process = await self.update_progress_repository.get_update_process()
         stage_id = await self.update_progress_repository.start_progress_stage(
             name="2. Updating index", process_id=process["id"]

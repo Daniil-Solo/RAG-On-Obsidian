@@ -1,14 +1,15 @@
 import asyncio
 
-from sqlmodel import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.services.vector_store_service.base import BaseVectorStoreService
-from src.services.embeddings_service.base import BaseEmbeddingsService, EmbeddingsException
+from sqlmodel import delete, select
+
 from src.database.models import ChunkEmbeddingModel
+from src.services.embeddings_service.base import BaseEmbeddingsService, EmbeddingsError
+from src.services.vector_store_service.base import BaseVectorStoreService
 
 
 class PGVectorStoreService(BaseVectorStoreService):
-    def __init__(self, session: AsyncSession, embedding_service: BaseEmbeddingsService):
+    def __init__(self, session: AsyncSession, embedding_service: BaseEmbeddingsService) -> None:
         self.session = session
         self.embedding_service = embedding_service
 
@@ -26,7 +27,7 @@ class PGVectorStoreService(BaseVectorStoreService):
     async def add_chunks(self, texts: list[str], filenames: list[str]) -> None:
         try:
             embeds = await self.embedding_service.embed_many(texts)
-        except EmbeddingsException:
+        except EmbeddingsError:
             await asyncio.sleep(2)
             embeds = await self.embedding_service.embed_many(texts)
         for embed, text, filename in zip(embeds, texts, filenames):

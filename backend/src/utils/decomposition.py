@@ -1,12 +1,11 @@
+import logging
 import os
 
 import numpy as np
-import logging
 from sklearn.decomposition import PCA
 
 from src.repositories.index.interface import FileRepository
 from src.services.vector_store_service.base import BaseVectorStoreService
-
 
 logger = logging.getLogger(__name__)
 
@@ -41,19 +40,21 @@ async def get_decomposition_components(
     for file_path in file_paths_to_delete:
         current_file_paths.remove(file_path)
 
-    results = []
-    for index, file_path in enumerate(current_file_paths):
-        results.append({
+    results = [
+        {
             "file_path": file_path,
             "x": float(decomposition_result[index, 0]),
             "y": float(decomposition_result[index, 1]),
             "is_removed": False
-        })
-    for file_path in file_paths_to_delete:
-        results.append({
-            "file_path": file_path,
-            "is_removed": True
-        })
+        }
+        for index, file_path in enumerate(current_file_paths)
+    ]
+    results.extend(
+        [
+            {"file_path": file_path, "x": 0, "y": 0, "is_removed": True}
+            for file_path in file_paths_to_delete
+        ]
+    )
 
-    logger.info(f"PCA over embeddings calculated successfully")
+    logger.info("PCA over embeddings calculated successfully")
     return results

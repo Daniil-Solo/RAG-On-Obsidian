@@ -1,18 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, Depends
 
+from src.api.general_dependencies import get_vector_store_service
 from src.api.general_schemas import MessageResponse
-from src.api.index.dependencies import get_index_service, get_update_progress_repository
+from src.api.index.dependencies import get_file_repository, get_index_service, get_update_progress_repository
 from src.api.index.schemas import ClustersResponse, IndexInfoResponse, StageProgressSchema, UpdateIndexProgressResponse
-from src.repositories.index.interface import UpdateProgressRepository
+from src.repositories.index.interface import FileRepository, UpdateProgressRepository
 from src.services.index_service.base import BaseIndexService
 from src.services.vector_store_service.base import BaseVectorStoreService
-from src.api.general_dependencies import get_vector_store_service
-from src.api.index.dependencies import get_file_repository
-from src.repositories.index.interface import FileRepository
-from src.utils.update_vector_store import update_vector_store
 from src.utils.decomposition import get_decomposition_components
+from src.utils.update_vector_store import update_vector_store
 
 index_router = APIRouter(prefix="/index", tags=["index"])
 
@@ -41,7 +39,6 @@ async def get_clusters(
 
 @index_router.put("/", response_model=MessageResponse)
 async def update_index(
-    background_tasks: BackgroundTasks,
     index_service: Annotated[BaseIndexService, Depends(get_index_service)],
     vector_store_service: Annotated[BaseVectorStoreService, Depends(get_vector_store_service)],
     update_progress_repository: Annotated[UpdateProgressRepository, Depends(get_update_progress_repository)],
@@ -51,7 +48,6 @@ async def update_index(
     if current_process:
         return MessageResponse(message="The index update operation has already started")
 
-    # async def update_index_in_background() -> None:
     process_id = await update_progress_repository.start_update_process()
     files_to_update = await index_service.find_files_to_update()
     await update_vector_store(files_to_update, update_progress_repository, vector_store_service)
@@ -59,7 +55,6 @@ async def update_index(
     await index_service.update(results)
     await update_progress_repository.finish_update_process(process_id=process_id)
 
-    # background_tasks.add_task(update_index_in_background)
     return MessageResponse(message="Index has been updated")
 
 

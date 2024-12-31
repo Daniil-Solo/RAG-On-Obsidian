@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import delete, select, update, desc
+from sqlmodel import delete, desc, select, update
 
 from src.database.models import FileModel, ProgressStageModel, UpdateProcessModel
 from src.repositories.index.interface import FileRepository, UpdateProgressRepository
@@ -73,7 +73,7 @@ class UpdateProgressSQLAlchemyRepository(UpdateProgressRepository):
         return new_process.id
 
     async def get_update_process(self) -> dict | None:
-        statement = select(UpdateProcessModel).where(UpdateProcessModel.is_actual == True)
+        statement = select(UpdateProcessModel).where(UpdateProcessModel.is_actual)
         result = await self.session.execute(statement)
         process = result.scalars().first()
         return process and process.model_dump()
@@ -81,7 +81,7 @@ class UpdateProgressSQLAlchemyRepository(UpdateProgressRepository):
     async def get_last_update_process(self) -> dict | None:
         statement = (
             select(UpdateProcessModel)
-            .where(UpdateProcessModel.is_actual == False)
+            .where(~UpdateProcessModel.is_actual)
             .order_by(desc(UpdateProcessModel.finished_at))
             .limit(1)
         )

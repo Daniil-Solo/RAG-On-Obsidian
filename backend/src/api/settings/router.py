@@ -3,13 +3,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from src.api.general_dependencies import get_llm_tokens_repository
 from src.api.general_schemas import MessageResponse
 from src.api.settings.dependencies import get_settings_repository
 from src.api.settings.schemas import LLMAvailabilityResponse, LLMSettingsRequest, LLMSettingsResponse
+from src.repositories.llm_tokens.interface import LLMTokensRepository
 from src.repositories.settings.interface import SettingsRepository
 from src.services.llm_service.builder import LLMServiceBuilder
-from src.api.general_dependencies import get_llm_tokens_repository
-from src.repositories.llm_tokens.interface import LLMTokensRepository
 
 settings_router = APIRouter(prefix="/settings", tags=["settings"])
 

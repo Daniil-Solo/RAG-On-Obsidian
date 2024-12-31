@@ -3,12 +3,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from pydantic import NonNegativeInt, PositiveInt
 
-from src.api.messages.dependencies import get_message_repository
-from src.api.general_dependencies import get_rag_service, get_llm_tokens_repository
-from src.api.messages.schemas import AnswerResponse, MessageHistoryResponse, MessageSchema, QueryRequest
+from src.api.general_dependencies import get_llm_tokens_repository, get_rag_service
 from src.api.general_schemas import MessageResponse
-from src.repositories.message.interface import MessageRepository
+from src.api.messages.dependencies import get_message_repository
+from src.api.messages.schemas import AnswerResponse, MessageHistoryResponse, MessageSchema, QueryRequest
 from src.repositories.llm_tokens.interface import LLMTokensRepository
+from src.repositories.message.interface import MessageRepository
 from src.services.rag_service.base import BaseRagService
 
 messages_router = APIRouter(prefix="/messages", tags=["messages"])

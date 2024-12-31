@@ -9,7 +9,7 @@ from src.database.session import get_async_session
 from src.repositories.index.interface import FileRepository, UpdateProgressRepository
 from src.repositories.index.sqlalchemy import FileSQLAlchemyRepository, UpdateProgressSQLAlchemyRepository
 from src.services.index_service.base import BaseIndexService
-from src.services.index_service.demo import DemoIndexService
+from src.services.index_service.final import DemoIndexService
 
 
 def get_file_repository(

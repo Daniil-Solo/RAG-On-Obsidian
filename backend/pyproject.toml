@@ -46,4 +46,4 @@ fix=true
 unsafe-fixes=false
 line-length = 120
 lint.select = ["ALL"]
-lint.ignore = ["F401", "FA102", "D211", "D213", "D", "DTZ005", "FA100", "COM812", "ISC001"]
+lint.ignore = ["F401", "FA102", "D211", "D213", "D", "DTZ005", "FA100", "COM812", "ISC001", "G004", "PTH", "DTZ"]
