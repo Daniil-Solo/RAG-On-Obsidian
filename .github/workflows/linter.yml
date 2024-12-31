@@ -25,9 +25,11 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
+        working-directory: ./backend
         run: |
           pip install poetry
           poetry install
       - name: Ruff linter
+        working-directory: ./backend
         run: |
           poetry run ruff check src
