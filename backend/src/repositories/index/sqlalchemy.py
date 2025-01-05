@@ -73,7 +73,7 @@ class UpdateProgressSQLAlchemyRepository(UpdateProgressRepository):
         return new_process.id
 
     async def get_update_process(self) -> dict | None:
-        statement = select(UpdateProcessModel).where(UpdateProcessModel.is_actual)
+        statement = select(UpdateProcessModel).where(UpdateProcessModel.is_actual == True)  # noqa: E712
         result = await self.session.execute(statement)
         process = result.scalars().first()
         return process and process.model_dump()
@@ -81,7 +81,7 @@ class UpdateProgressSQLAlchemyRepository(UpdateProgressRepository):
     async def get_last_update_process(self) -> dict | None:
         statement = (
             select(UpdateProcessModel)
-            .where(~UpdateProcessModel.is_actual)
+            .where(UpdateProcessModel.is_actual == False)  # noqa: E712
             .order_by(desc(UpdateProcessModel.finished_at))
             .limit(1)
         )
