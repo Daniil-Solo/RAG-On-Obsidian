@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: |
-          pip install poetry
+          pip install poetry==1.8.5
           poetry install
       - name: Ruff linter
         working-directory: ./backend

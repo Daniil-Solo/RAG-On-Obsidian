@@ -128,7 +128,7 @@
 1. Устанавливаем PostgreSQL, создаем базу данных, не забываем пароль
 2. Устанавливаем расширение pgvector в этой базе данных командой: `CREATE EXTENSION IF NOT EXISTS vector;`
 3. Скачиваем репозиторий командой: `git clone https://github.com/Daniil-Solo/RAG-On-Obsidian.git`
-4. Создаем виртуальное окружение в директории backend и устанавливаем зависимости: `pip install poetry && poetry install`
+4. Создаем виртуальное окружение в директории backend и устанавливаем зависимости: `pip install poetry==1.8.5 && poetry install`
 5. Скачиваем папку с билдом фронта в директорию backend [папку с Google-диска](https://drive.google.com/drive/folders/13eJsjdyAk7QsPuFDU_Jwq0nZNWYhmWoo?usp=sharing)
 6. Создаем в директори backend файл .env и заполняем его:
 ```env

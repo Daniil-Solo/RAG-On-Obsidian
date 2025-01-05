@@ -8,7 +8,7 @@ RUN npm run build
 FROM python:3.11-slim AS python_builder
 WORKDIR /app
 COPY ./backend/pyproject.toml ./
-RUN python -m pip install --no-cache-dir poetry && poetry config virtualenvs.in-project true && poetry install --no-interaction --no-ansi
+RUN python -m pip install --no-cache-dir poetry==1.8.5 && poetry config virtualenvs.in-project true && poetry install --no-interaction --no-ansi
 
 FROM python:3.11-slim as production
 WORKDIR /app
